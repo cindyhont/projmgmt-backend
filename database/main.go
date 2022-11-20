@@ -31,8 +31,8 @@ func Setup() {
 	_, err = DB.Exec(`
 		BEGIN;
 
-			/* CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; */
-			CREATE EXTENSION IF NOT EXISTS pg_trgm;
+			/* CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
+			CREATE EXTENSION IF NOT EXISTS pg_trgm; */
 			CREATE EXTENSION IF NOT EXISTS ltree;
 
 			CREATE TABLE IF NOT EXISTS users (
