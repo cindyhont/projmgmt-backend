@@ -31,9 +31,9 @@ func Setup() {
 	_, err = DB.Exec(`
 		BEGIN;
 
-			/* CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
+			CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
 			CREATE EXTENSION IF NOT EXISTS pg_trgm; 
-			CREATE EXTENSION IF NOT EXISTS ltree; */
+			CREATE EXTENSION IF NOT EXISTS ltree;
 
 			CREATE TABLE IF NOT EXISTS users (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -68,6 +68,7 @@ func Setup() {
 			);
 			CREATE INDEX IF NOT EXISTS departments_tsv ON departments USING gin (tsv);
 
+			/*
 			CREATE TABLE IF NOT EXISTS user_details (
 				id uuid UNIQUE NOT NULL,
 				invitation_mail_key uuid DEFAULT gen_random_uuid(),
@@ -540,7 +541,8 @@ func Setup() {
 				false,
 				false
 			)
-		ON CONFLICT (id) DO NOTHING;
+			ON CONFLICT (id) DO NOTHING;
+			*/
 
 		END;
 	`)
