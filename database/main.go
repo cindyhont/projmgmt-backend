@@ -11,7 +11,7 @@ import (
 var DB *sql.DB
 
 func Setup() {
-	fmt.Println(os.Getenv("DATABASE_URL"))
+	fmt.Println("DATABASE_URL: ", os.Getenv("DATABASE_URL"))
 	var err error
 	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 
