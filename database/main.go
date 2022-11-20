@@ -32,8 +32,8 @@ func Setup() {
 		BEGIN;
 
 			/* CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
-			CREATE EXTENSION IF NOT EXISTS pg_trgm; */
-			CREATE EXTENSION IF NOT EXISTS ltree;
+			CREATE EXTENSION IF NOT EXISTS pg_trgm; 
+			CREATE EXTENSION IF NOT EXISTS ltree; */
 
 			CREATE TABLE IF NOT EXISTS users (
 				id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
