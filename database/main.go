@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -10,6 +11,7 @@ import (
 var DB *sql.DB
 
 func Setup() {
+	fmt.Println(os.Getenv("DATABASE_URL"))
 	var err error
 	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 
