@@ -68,7 +68,7 @@ func Setup() {
 			);
 			CREATE INDEX IF NOT EXISTS departments_tsv ON departments USING gin (tsv);
 
-			/*
+		
 			CREATE TABLE IF NOT EXISTS user_details (
 				id uuid UNIQUE NOT NULL,
 				invitation_mail_key uuid DEFAULT gen_random_uuid(),
@@ -542,7 +542,7 @@ func Setup() {
 				false
 			)
 			ON CONFLICT (id) DO NOTHING;
-			*/
+			
 
 		END;
 	`)
