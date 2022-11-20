@@ -36,5 +36,5 @@ jobs:
     - name: Build
       run: go build -o exec
 
-    - name: Run
-      run: ./exec
+#    - name: Run
+#      run: ./exec
