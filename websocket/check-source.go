@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/cindyhont/projmgmt-backend/database"
 )
@@ -10,8 +9,8 @@ import (
 func getUserID(req *http.Request) string {
 	s, err := req.Cookie("sid")
 	if err != nil {
-		return os.Getenv("DEMO_USER")
-		// return ""
+		// return os.Getenv("DEMO_USER")
+		return ""
 	}
 	sid := s.Value
 	var uid string
