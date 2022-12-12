@@ -31,8 +31,8 @@ func Setup() {
 	_, err = DB.Exec(`
 		BEGIN;
 
-			CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
-			CREATE EXTENSION IF NOT EXISTS pg_trgm; 
+			CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+			CREATE EXTENSION IF NOT EXISTS pg_trgm;
 			CREATE EXTENSION IF NOT EXISTS ltree;
 
 			CREATE TABLE IF NOT EXISTS users (
@@ -55,7 +55,7 @@ func Setup() {
 
 			CREATE TABLE IF NOT EXISTS wrong_login (
 				ip character varying(50) NOT NULL,
-    			"time" timestamptz NOT NULL DEFAULT now()
+				"time" timestamptz NOT NULL DEFAULT now()
 			);
 			CREATE INDEX IF NOT EXISTS wrong_login_time ON wrong_login USING btree ("time" ASC);
 			CREATE INDEX IF NOT EXISTS wrong_login_ip ON wrong_login (ip);
@@ -68,7 +68,7 @@ func Setup() {
 			);
 			CREATE INDEX IF NOT EXISTS departments_tsv ON departments USING gin (tsv);
 
-		
+
 			CREATE TABLE IF NOT EXISTS user_details (
 				id uuid UNIQUE NOT NULL,
 				invitation_mail_key uuid DEFAULT gen_random_uuid(),
@@ -118,7 +118,7 @@ func Setup() {
 
 			CREATE TABLE IF NOT EXISTS ws_message_to (
 				message_id uuid NOT NULL,
-    			uid uuid NOT NULL,
+				uid uuid NOT NULL,
 				CONSTRAINT fk_message_id FOREIGN KEY (message_id)
 					REFERENCES ws_message_content (id) MATCH SIMPLE
 					ON UPDATE NO ACTION
@@ -200,7 +200,7 @@ func Setup() {
 
 			CREATE TABLE IF NOT EXISTS task_approval_list (
 				id smallint PRIMARY KEY,
-    			name varchar(100) NOT NULL
+				name varchar(100) NOT NULL
 			);
 
 			CREATE TABLE IF NOT EXISTS tasks (
@@ -542,7 +542,7 @@ func Setup() {
 				false
 			)
 			ON CONFLICT (id) DO NOTHING;
-			
+
 
 		END;
 	`)
