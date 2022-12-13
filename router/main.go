@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -25,6 +26,15 @@ func testHttpsAPI(
 	json.NewEncoder(w).Encode(map[string]bool{"https-success": true})
 }
 
+func testCookies(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params,
+) {
+	fmt.Println(r.Cookies())
+	json.NewEncoder(w).Encode(map[string]int{"cookie-length": len(r.Cookies())})
+}
+
 /*
 func testHttpAPI(
 
@@ -39,6 +49,7 @@ func testHttpAPI(
 
 func Listen() {
 	Router.GET("/", testHttpsAPI)
+	Router.GET("/test-cookies", testCookies)
 	handler := cors.Default().Handler(Router)
 	http.ListenAndServe(":"+os.Getenv("PORT"), handler)
 }
