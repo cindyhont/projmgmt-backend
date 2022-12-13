@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
@@ -9,6 +10,7 @@ import (
 func getUserID(req *http.Request) string {
 	s, err := req.Cookie("sid")
 	if err != nil {
+		fmt.Println(err)
 		// return os.Getenv("DEMO_USER")
 		return ""
 	}
