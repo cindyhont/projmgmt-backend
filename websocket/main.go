@@ -15,33 +15,18 @@ import (
 
 var users = map[string]map[*net.Conn]bool{}
 
-// var newOnlineUser string
-
 func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// uid := getUserID(req)
-	// if uid == "" {
-	// 	res.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-
 	var uid string
-	fmt.Println("ws-origin: ", req.Header.Get("Origin"))
+
+	if !originOK(req) {
+		return
+	}
 
 	myConn, _, _, err := ws.UpgradeHTTP(req, res)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	/*
-		if _, keyAlreadyExists := users[uid]; keyAlreadyExists {
-			users[uid][&myConn] = true
-		} else {
-			var user = make(map[*net.Conn]bool)
-			user[&myConn] = true
-			users[uid] = user
-		}
-	*/
 
 	go func() {
 		defer closeConnection(&myConn)
@@ -87,6 +72,8 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 					}
 					go sendOnlineUserList(&myConn, uid)
 					go announceUserStatus(uid, true)
+				} else {
+					return
 				}
 			} else if req.Request == "chat_typing" && uid != "" {
 				updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
