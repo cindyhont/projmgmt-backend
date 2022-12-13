@@ -12,6 +12,7 @@ func checkUserExists(uid string) bool {
 		fmt.Println(err)
 		return false
 	}
+	fmt.Println(exists)
 	return exists
 }
 
