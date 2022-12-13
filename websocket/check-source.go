@@ -11,7 +11,7 @@ func getUserID(req *http.Request) string {
 	s, err := req.Cookie("sid")
 	if err != nil {
 		fmt.Println(err)
-		// return os.Getenv("DEMO_USER")
+		fmt.Println(req.Cookies())
 		return ""
 	}
 	sid := s.Value
