@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -16,5 +17,8 @@ func checkUserExists(uid string) bool {
 }
 
 func originOK(req *http.Request) bool {
-	return req.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER")
+	fmt.Println(req.Header.Get("Origin"))
+	fmt.Println(os.Getenv("ORIGIN_REFERRER"))
+	// return req.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER")
+	return true
 }
