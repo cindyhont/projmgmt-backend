@@ -1,10 +1,15 @@
 package websocket
 
-import "github.com/cindyhont/projmgmt-backend/database"
+import (
+	"fmt"
+
+	"github.com/cindyhont/projmgmt-backend/database"
+)
 
 func checkUserExists(uid string) bool {
 	var exists bool
 	if err := database.DB.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE username = $1 AND authorized)", uid).Scan(&exists); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return exists
