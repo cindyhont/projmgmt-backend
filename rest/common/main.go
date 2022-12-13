@@ -20,6 +20,8 @@ func SetSessionCookie(w http.ResponseWriter, newSID string, expiry time.Time) {
 		Path:     "/",
 		Expires:  expiry,
 		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Secure:   true,
 	}
 	http.SetCookie(w, &cookie)
 }
