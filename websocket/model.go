@@ -12,4 +12,5 @@ type request struct {
 	Requests   []string `json:"reqs"`
 	ChatRoomID string   `json:"roomid,omitempty"`
 	Typing     bool     `json:"typing,omitempty"`
+	UserID     string   `json:"uid,omitempty"`
 }

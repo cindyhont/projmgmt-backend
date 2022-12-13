@@ -15,14 +15,17 @@ import (
 
 var users = map[string]map[*net.Conn]bool{}
 
-var newOnlineUser string
+// var newOnlineUser string
 
 func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	uid := getUserID(req)
-	if uid == "" {
-		res.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	// uid := getUserID(req)
+	// if uid == "" {
+	// 	res.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
+
+	var uid string
+	fmt.Println("ws-origin: ", req.Header.Get("Origin"))
 
 	myConn, _, _, err := ws.UpgradeHTTP(req, res)
 	if err != nil {
@@ -30,17 +33,18 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	if _, keyAlreadyExists := users[uid]; keyAlreadyExists {
-		users[uid][&myConn] = true
-	} else {
-		var user = make(map[*net.Conn]bool)
-		user[&myConn] = true
-		users[uid] = user
-		newOnlineUser = uid
-	}
+	/*
+		if _, keyAlreadyExists := users[uid]; keyAlreadyExists {
+			users[uid][&myConn] = true
+		} else {
+			var user = make(map[*net.Conn]bool)
+			user[&myConn] = true
+			users[uid] = user
+		}
+	*/
 
 	go func() {
-		defer closeConnection(&myConn, uid)
+		defer closeConnection(&myConn)
 
 		var (
 			r       = wsutil.NewReader(myConn, ws.StateServerSide)
@@ -55,7 +59,7 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 			}
 
 			if hdr.OpCode == ws.OpClose {
-				if len(users[uid]) == 1 {
+				if uid != "" && len(users[uid]) == 1 {
 					go announceUserStatus(uid, false)
 				}
 			}
@@ -66,19 +70,25 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				return
 			}
 
-			if newOnlineUser != "" {
-				go announceUserStatus(uid, true)
-				newOnlineUser = ""
-			}
-
 			if req.Request == "" && len(req.Requests) == 0 {
 				CleanOldWsRecords()
 				return
 			}
 
-			if req.Request == "online-users" {
-				go sendOnlineUserList(&myConn, uid)
-			} else if req.Request == "chat_typing" {
+			if req.Request == "online-users" && req.UserID != "" {
+				if checkUserExists(req.UserID) {
+					uid = req.UserID
+					if _, keyAlreadyExists := users[uid]; keyAlreadyExists {
+						users[uid][&myConn] = true
+					} else {
+						var user = make(map[*net.Conn]bool)
+						user[&myConn] = true
+						users[uid] = user
+					}
+					go sendOnlineUserList(&myConn, uid)
+					go announceUserStatus(uid, true)
+				}
+			} else if req.Request == "chat_typing" && uid != "" {
 				updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
 			} else if req.Request != "" {
 				go dispatchMsgFromDB(&myConn, req.Request)
@@ -260,12 +270,18 @@ func announceUserStatus(uid string, online bool) {
 	}
 }
 
-func closeConnection(conn *net.Conn, uid string) {
-	delete(users[uid], conn)
-	if len(users[uid]) == 0 {
-		delete(users, uid)
+func closeConnection(myConn *net.Conn) {
+	for user, connMap := range users {
+		for conn := range connMap {
+			if conn == myConn {
+				delete(users[user], conn)
+				if len(users[user]) == 0 {
+					delete(users, user)
+				}
+			}
+		}
 	}
-	(*conn).Close()
+	(*myConn).Close()
 }
 
 func RunWS() {

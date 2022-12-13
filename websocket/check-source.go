@@ -1,12 +1,16 @@
 package websocket
 
-import (
-	"fmt"
-	"net/http"
+import "github.com/cindyhont/projmgmt-backend/database"
 
-	"github.com/cindyhont/projmgmt-backend/database"
-)
+func checkUserExists(uid string) bool {
+	var exists bool
+	if err := database.DB.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE username = $1 AND authorized)", uid).Scan(&exists); err != nil {
+		return false
+	}
+	return exists
+}
 
+/*
 func getUserID(req *http.Request) string {
 	s, err := req.Cookie("sid")
 	if err != nil {
@@ -22,6 +26,7 @@ func getUserID(req *http.Request) string {
 	}
 	return uid
 }
+*/
 
 // func originOK(req *http.Request) bool {
 // 	return req.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER")
