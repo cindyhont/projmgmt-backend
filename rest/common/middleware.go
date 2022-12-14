@@ -39,7 +39,7 @@ func sessionID(r *http.Request) (string, string) {
 			oldSessionID = s.Value
 		}
 	} else if fetchSessionMethod == "body" {
-		fmt.Println(r.Host)
+		fmt.Println(r.RemoteAddr)
 		oldSessionID = r.Header.Get("sid")
 	}
 	return fetchSessionMethod, oldSessionID
