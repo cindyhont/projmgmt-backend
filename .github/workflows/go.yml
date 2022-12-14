@@ -40,7 +40,7 @@ jobs:
         key: ${{ secrets.SERVER_KEY }}
         port: ${{ secrets.SERVER_PORT }}
         password: ${{ secrets.SERVER_PASSWORD }}
-      script: |
-        killall exec-projmgmt-backend 2>/dev/null
-        cd ${{ secrets.SERVER_DIRECTORY }}
-        nohup ./exec-projmgmt-backend &
+        script: |
+          killall exec-projmgmt-backend 2>/dev/null
+          cd ${{ secrets.SERVER_DIRECTORY }}
+          nohup ./exec-projmgmt-backend &
