@@ -37,8 +37,8 @@ jobs:
         SSH_KEY: ${{ secrets.SERVER_KEY }}
         SSH_HOST: ${{ secrets.SERVER_HOST }}
     - name: Stop the server
-      run: ssh staging 'sudo killall exec-projmgmt-backend 2> /dev/null'
-    - name: Go to directory
-      run: ssh staging 'cd actions-runner/_work/projmgmt-backend/projmgmt-backend'
-    - name: Run
-      run: ssh staging 'nohup ./exec-projmgmt-backend &'
+      run: ssh staging 'ls'
+    # - name: Go to directory
+    #   run: ssh staging 'cd actions-runner/_work/projmgmt-backend/projmgmt-backend'
+    # - name: Run
+    #   run: ssh staging 'nohup ./exec-projmgmt-backend &'
