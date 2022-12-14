@@ -22,16 +22,15 @@ env:
   PORT: ${{ secrets.PORT }}
 
 jobs:
-
   build:
     runs-on: self-hosted
     steps:
+    - run: killall exec-projmgmt-backend 2>/dev/null
     - uses: actions/checkout@v3
-
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
-
     - name: Build
-      run: go build -o exec
+      run: go build -o exec-projmgmt-backend
+    - run: nohup ./exec-projmgmt-backend &
