@@ -20,3 +20,25 @@ jobs:
         go-version: 1.19
     - name: Build
       run: go build -o exec-projmgmt-backend
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/staging.key
+        chmod 600 ~/.ssh/staging.key
+        cat >>~/.ssh/config <<END
+        Host staging
+          HostName $SSH_HOST
+          User $SSH_USER
+          IdentityFile ~/.ssh/staging.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ secrets.SERVER_USERNAME }}
+        SSH_KEY: ${{ secrets.SERVER_KEY }}
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+    - name: Stop the server
+      run: ssh staging 'killall exec-projmgmt-backend 2> /dev/null'
+    - name: Go to directory
+      run: ssh staging 'cd actions-runner/_work/projmgmt-backend/projmgmt-backend'
+    - name: Run
+      run: ssh staging 'nohup ./exec-projmgmt-backend &'
