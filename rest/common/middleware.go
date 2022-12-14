@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -46,7 +45,6 @@ func sessionID(r *http.Request) (string, string) {
 
 func AuthRequired(next AuthHandler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		fmt.Println(r)
 		usermgmt.DeleteExpiredSessions()
 		fetchSessionMethod, oldSessionID := sessionID(r)
 
