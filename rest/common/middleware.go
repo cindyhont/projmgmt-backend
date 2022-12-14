@@ -1,8 +1,9 @@
 package common
 
 import (
-	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
@@ -33,13 +34,12 @@ type AuthUrHandler func(
 func sessionID(r *http.Request) (string, string) {
 	fetchSessionMethod := r.Header.Get("sMethod")
 	oldSessionID := ""
-	if fetchSessionMethod == "ck" {
+	if fetchSessionMethod == "ck" && r.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER") {
 		s, err := r.Cookie("sid")
 		if err == nil {
 			oldSessionID = s.Value
 		}
-	} else if fetchSessionMethod == "body" {
-		fmt.Println(r.RemoteAddr)
+	} else if fetchSessionMethod == "body" && strings.Split(r.RemoteAddr, ":")[0] == os.Getenv("FRONTEND_IP") {
 		oldSessionID = r.Header.Get("sid")
 	}
 	return fetchSessionMethod, oldSessionID
