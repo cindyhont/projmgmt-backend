@@ -33,14 +33,13 @@ jobs:
     - name: Build
       run: go build -o exec-projmgmt-backend
     - name: Deploy
-      uses: appleboy/ssh-action@master
+      uses: garygrossgarten/github-action-ssh@release
       with: 
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
+        privateKey: ${{ secrets.SERVER_KEY }}
         password: ${{ secrets.SERVER_PASSWORD }}
-        script: |
+        command: |
           killall exec-projmgmt-backend 2>/dev/null
           cd ${{ secrets.SERVER_DIRECTORY }}
           nohup ./exec-projmgmt-backend &
