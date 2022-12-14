@@ -41,7 +41,7 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         passphrase: ${{ secrets.SERVER_PASSWORD }}
         password: ${{ secrets.SERVER_PASSWORD }}
-        script: |
+        command: |
           killall exec-projmgmt-backend 2>/dev/null
           cd ${{ secrets.SERVER_DIRECTORY }}
           nohup ./exec-projmgmt-backend &
