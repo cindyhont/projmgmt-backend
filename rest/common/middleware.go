@@ -39,6 +39,7 @@ func sessionID(r *http.Request) (string, string) {
 			oldSessionID = s.Value
 		}
 	} else if fetchSessionMethod == "body" {
+		fmt.Println(r)
 		oldSessionID = r.Header.Get("sid")
 	}
 	return fetchSessionMethod, oldSessionID
@@ -46,7 +47,6 @@ func sessionID(r *http.Request) (string, string) {
 
 func AuthRequired(next AuthHandler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		fmt.Println(r.Header.Get("Origin"))
 		usermgmt.DeleteExpiredSessions()
 		fetchSessionMethod, oldSessionID := sessionID(r)
 
