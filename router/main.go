@@ -38,6 +38,4 @@ func Listen() {
 	Router.GET("/", testHttpsAPI)
 	Router.GET("/test-cookies", testCookies)
 	http.ListenAndServe(":"+os.Getenv("PORT"), Router)
-	// handler := cors.Default().Handler(Router)
-	// http.ListenAndServe(":"+os.Getenv("PORT"), handler)
 }
