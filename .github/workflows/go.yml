@@ -25,7 +25,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - run: killall exec-projmgmt-backend 2>/dev/null
+    - run: killall exec-projmgmt-backend >/dev/null
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
