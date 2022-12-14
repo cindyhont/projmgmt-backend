@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 var Router *httprouter.Router
@@ -37,7 +38,6 @@ func testCookies(
 func Listen() {
 	Router.GET("/", testHttpsAPI)
 	Router.GET("/test-cookies", testCookies)
-	http.ListenAndServe(":"+os.Getenv("PORT"), Router)
-	// handler := cors.Default().Handler(Router)
-	// http.ListenAndServe(":"+os.Getenv("PORT"), handler)
+	handler := cors.Default().Handler(Router)
+	http.ListenAndServe(":"+os.Getenv("PORT"), handler)
 }
