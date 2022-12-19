@@ -2,7 +2,6 @@ package login
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"sync"
@@ -26,13 +25,11 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var user model.User
 	var body []byte
 	if body, err = io.ReadAll(r.Body); err != nil {
-		fmt.Println("a:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err = json.Unmarshal(body, &user); err != nil {
-		fmt.Println("b:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
