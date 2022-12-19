@@ -40,7 +40,7 @@ func sessionID(r *http.Request) (string, string) {
 		if err == nil {
 			oldSessionID = s.Value
 		}
-	} else if fetchSessionMethod == "body" && (remoteAddr == os.Getenv("FRONTEND_IP_A") || remoteAddr == os.Getenv("FRONTEND_IP_B")) {
+	} else if fetchSessionMethod == "body" && (remoteAddr == os.Getenv("INSTANCE_A_PRIVATE") || remoteAddr == os.Getenv("INSTANCE_B_PRIVATE")) {
 		oldSessionID = r.Header.Get("sid")
 	}
 	return fetchSessionMethod, oldSessionID
