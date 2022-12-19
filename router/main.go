@@ -37,5 +37,5 @@ func testCookies(
 func Listen() {
 	Router.GET("/", testHttpsAPI)
 	Router.GET("/test-cookies", testCookies)
-	http.ListenAndServe(":"+os.Getenv("PORT"), Router)
+	http.ListenAndServe(":"+os.Getenv("PROJMGMT_BACKEND_PORT"), Router)
 }

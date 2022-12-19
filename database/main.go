@@ -542,8 +542,6 @@ func Setup() {
 				false
 			)
 			ON CONFLICT (id) DO NOTHING;
-
-
 		END;
 	`)
 	if err != nil {
