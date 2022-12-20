@@ -2,6 +2,7 @@ package instantcomm
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 
@@ -88,6 +89,7 @@ func runRabbitmq() {
 }
 
 func subscribeServerMessage() {
+	fmt.Println("subscribing message queue")
 	var forever chan struct{}
 
 	msgs, err := rabbitmqChannel.Consume(
@@ -159,7 +161,6 @@ func subscribeServerMessage() {
 			}
 		}
 	}()
-
 	<-forever
 }
 
@@ -183,6 +184,7 @@ func publishHeartbeat() {
 }
 
 func subscribeServerHeartbeat() {
+	fmt.Println("subscribing heartbeat")
 	var forever chan struct{}
 
 	msgs, err := rabbitmqChannel.Consume(
