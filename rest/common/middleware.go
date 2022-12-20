@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -36,8 +35,6 @@ func sessionID(r *http.Request) (string, string) {
 	fetchSessionMethod := r.Header.Get("sMethod")
 	oldSessionID := ""
 	remoteAddr := strings.Split(r.RemoteAddr, ":")[0]
-	fmt.Println("remoteAddr: ", remoteAddr)
-	fmt.Println("Origin: ", r.Header.Get("Origin"))
 	if fetchSessionMethod == "ck" && r.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER") {
 		s, err := r.Cookie("sid")
 		if err == nil {

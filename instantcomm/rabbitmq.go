@@ -174,7 +174,6 @@ func subscribeServerMessage() {
 				continue
 			}
 
-			fmt.Println(res)
 			if res.Type == "user-status" {
 				uid := res.Payload["id"].(string)
 				online := res.Payload["online"].(bool)
