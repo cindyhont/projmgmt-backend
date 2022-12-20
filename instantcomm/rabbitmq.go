@@ -41,7 +41,7 @@ func runRabbitmq() {
 
 	err = rabbitmqChannel.ExchangeDeclare(
 		rabbitMqExchangeName,
-		"fanout",
+		"direct",
 		true,
 		false,
 		false,
@@ -79,30 +79,30 @@ func runRabbitmq() {
 
 			///////////////
 
-			// myMessageQueue, err = rabbitmqChannel.QueueDeclare(
-			// 	messageQueueName(serverIP),
-			// 	true,
-			// 	false,
-			// 	false,
-			// 	false,
-			// 	nil,
-			// )
-			// if err != nil {
-			// 	panic(err)
-			// }
+			myMessageQueue, err = rabbitmqChannel.QueueDeclare(
+				messageQueueName(serverIP),
+				true,
+				false,
+				false,
+				false,
+				nil,
+			)
+			if err != nil {
+				panic(err)
+			}
 
-			// err = rabbitmqChannel.QueueBind(
-			// 	myMessageQueue.Name,
-			// 	"",
-			// 	rabbitMqExchangeName,
-			// 	false,
-			// 	nil,
-			// )
-			// if err != nil {
-			// 	panic(err)
-			// }
+			err = rabbitmqChannel.QueueBind(
+				myMessageQueue.Name,
+				"",
+				rabbitMqExchangeName,
+				false,
+				nil,
+			)
+			if err != nil {
+				panic(err)
+			}
 
-			// go subscribeServerMessage()
+			go subscribeServerMessage()
 		} else {
 			hbQueue, err := rabbitmqChannel.QueueDeclare(
 				heartbeatQueueName(serverIP),
@@ -118,58 +118,51 @@ func runRabbitmq() {
 
 			otherServerHeartbeatQueues = append(otherServerHeartbeatQueues, hbQueue)
 
-			// mQueue, err := rabbitmqChannel.QueueDeclare(
-			// 	messageQueueName(serverIP),
-			// 	true,
-			// 	false,
-			// 	false,
-			// 	false,
-			// 	nil,
-			// )
-			// if err != nil {
-			// 	panic(err)
-			// }
+			mQueue, err := rabbitmqChannel.QueueDeclare(
+				messageQueueName(serverIP),
+				true,
+				false,
+				false,
+				false,
+				nil,
+			)
+			if err != nil {
+				panic(err)
+			}
 
-			// otherMessageQueues = append(otherMessageQueues, mQueue)
+			otherMessageQueues = append(otherMessageQueues, mQueue)
 		}
 	}
 
 	go publishHeartbeat()
-	// checkServerWorking()
+	checkServerWorking()
 }
 
 func publishHeartbeat() {
+	thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
+	for {
+		for _, queue := range otherServerHeartbeatQueues {
 
-	for _, queue := range otherServerHeartbeatQueues {
-		fmt.Println(queue.Name)
-	}
+			// fmt.Println("publishHeartbeat, queue.Name: ", queue.Name, time.Now())
+			// fmt.Println("publishHeartbeat, selfIP: ", os.Getenv("SELF_PRIVATE"))
+			// fmt.Println("")
 
-	/*
-		thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
-		for {
-			for _, queue := range otherServerHeartbeatQueues {
-
-				fmt.Println("publishHeartbeat, queue.Name: ", queue.Name, time.Now())
-				fmt.Println("publishHeartbeat, selfIP: ", os.Getenv("SELF_PRIVATE"))
-				fmt.Println("")
-
-				err := rabbitmqChannel.Publish(
-					rabbitMqExchangeName,
-					queue.Name,
-					false,
-					false,
-					amqp.Publishing{
-						ContentType: "text/plain",
-						Body:        thisServerIpBytes,
-					},
-				)
-				if err != nil {
-					panic(err)
-				}
+			err := rabbitmqChannel.Publish(
+				rabbitMqExchangeName,
+				queue.Name,
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        thisServerIpBytes,
+				},
+			)
+			if err != nil {
+				panic(err)
 			}
-			time.Sleep(time.Second)
 		}
-	*/
+		time.Sleep(time.Second)
+	}
 }
 
 func subscribeServerHeartbeat() {
