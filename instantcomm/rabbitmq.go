@@ -90,7 +90,7 @@ func runRabbitmq() {
 		panic(err)
 	}
 	go publishHeartbeat()
-	subscribeServerHeartbeat()
+	go subscribeServerHeartbeat()
 	go checkServerWorking()
 	subscribeServerMessage()
 }
