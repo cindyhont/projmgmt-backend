@@ -165,6 +165,7 @@ func subscribeServerMessage() {
 
 func publishHeartbeat() {
 	for {
+		fmt.Println(os.Getenv("SELF_PRIVATE"))
 		err := rabbitmqChannel.Publish(
 			rabbitMqExchangeName,
 			serverHeartbeatQueue.Name,
@@ -201,7 +202,7 @@ func subscribeServerHeartbeat() {
 	go func() {
 		for msg := range msgs {
 			serverIP := string(msg.Body)
-			servers[serverIP] = time.Now()
+			// servers[serverIP] = time.Now()
 			fmt.Println(serverIP, time.Now())
 		}
 	}()
