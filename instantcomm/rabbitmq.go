@@ -154,6 +154,7 @@ func publishHeartbeat() {
 			if err != nil {
 				panic(err)
 			}
+			fmt.Println(os.Getenv("SELF_PRIVATE"))
 		}
 		time.Sleep(time.Second)
 	}
