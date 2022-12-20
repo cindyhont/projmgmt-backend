@@ -142,11 +142,6 @@ func publishHeartbeat() {
 	thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
 	for {
 		for _, queue := range otherServerHeartbeatQueues {
-
-			// fmt.Println("publishHeartbeat, queue.Name: ", queue.Name, time.Now())
-			// fmt.Println("publishHeartbeat, selfIP: ", os.Getenv("SELF_PRIVATE"))
-			// fmt.Println("")
-
 			err := rabbitmqChannel.Publish(
 				rabbitMqExchangeName,
 				queue.Name,
@@ -184,11 +179,8 @@ func subscribeServerHeartbeat() {
 	go func() {
 		for msg := range msgs {
 			serverIP := string(msg.Body)
-			// fmt.Println(serverIP)
 
-			fmt.Println("subscribeServerHeartbeat, myServerHeartbeatQueue.Name: ", myServerHeartbeatQueue.Name, time.Now())
-			fmt.Println("subscribeServerHeartbeat, messageIP: ", serverIP)
-			fmt.Println("")
+			fmt.Println(serverIP)
 
 			servers[serverIP] = time.Now()
 		}
