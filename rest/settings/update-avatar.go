@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/julienschmidt/httprouter"
@@ -64,7 +64,7 @@ func updateAvatar(
 
 	database.DB.Exec("UPDATE user_details SET avatar = $1 WHERE id = $2", resp.SecureURL, uid)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "hrm_update-avatar",
 		Payload: map[string]interface{}{
 			"avatar": resp.SecureURL,
@@ -73,7 +73,7 @@ func updateAvatar(
 		ToAllRecipients: true,
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

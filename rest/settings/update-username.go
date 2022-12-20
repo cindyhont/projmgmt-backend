@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/common"
 	"github.com/cindyhont/projmgmt-backend/usermgmt"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -67,14 +67,14 @@ func updateUsername(
 		uid,
 	)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "settings_update-username",
 		Payload: map[string]interface{}{
 			"username": req.Username,
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

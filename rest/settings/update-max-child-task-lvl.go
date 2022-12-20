@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -53,7 +53,7 @@ func updateMaxChildTaskLvl(
 		uid,
 	)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "settings_update-max-child-task-lvl",
 		Payload: map[string]interface{}{
 			"maxChildTaskLvl": req.MaxChildTaskLvl,
@@ -61,7 +61,7 @@ func updateMaxChildTaskLvl(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 
 	json.NewEncoder(w).Encode(data)
