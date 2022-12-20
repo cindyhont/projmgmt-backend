@@ -9,8 +9,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const rabbitMqExchangeName = "" //"projmgmt"
-
 func heartbeatQueueName(ip string) string {
 	return fmt.Sprintf("projmgmt-server-heartbeat-%s", ip)
 }
@@ -39,19 +37,6 @@ func runRabbitmq() {
 	}
 	defer rabbitmqChannel.Close()
 
-	// err = rabbitmqChannel.ExchangeDeclare(
-	// 	rabbitMqExchangeName,
-	// 	"direct",
-	// 	true,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	nil,
-	// )
-	// if err != nil {
-	// 	panic(err)
-	// }
-
 	for _, serverIP := range ips {
 		if serverIP == thisServerIP {
 			myServerHeartbeatQueue, err = rabbitmqChannel.QueueDeclare(
@@ -65,16 +50,7 @@ func runRabbitmq() {
 			if err != nil {
 				panic(err)
 			}
-			// err = rabbitmqChannel.QueueBind(
-			// 	myServerHeartbeatQueue.Name,
-			// 	"",
-			// 	rabbitMqExchangeName,
-			// 	false,
-			// 	nil,
-			// )
-			// if err != nil {
-			// 	panic(err)
-			// }
+			// don't bind if using default exchange
 
 			///////////////
 
@@ -90,16 +66,7 @@ func runRabbitmq() {
 				panic(err)
 			}
 
-			// err = rabbitmqChannel.QueueBind(
-			// 	myMessageQueue.Name,
-			// 	"",
-			// 	rabbitMqExchangeName,
-			// 	false,
-			// 	nil,
-			// )
-			// if err != nil {
-			// 	panic(err)
-			// }
+			// don't bind if using default exchange
 		} else {
 			hbQueue, err := rabbitmqChannel.QueueDeclare(
 				heartbeatQueueName(serverIP),
@@ -142,7 +109,7 @@ func publishHeartbeat() {
 	for {
 		for _, queue := range otherServerHeartbeatQueues {
 			err := rabbitmqChannel.Publish(
-				rabbitMqExchangeName,
+				"",
 				queue.Name,
 				false,
 				false,
@@ -154,7 +121,6 @@ func publishHeartbeat() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("SELF_PRIVATE: ", os.Getenv("SELF_PRIVATE"))
 		}
 		time.Sleep(time.Second)
 	}
@@ -162,8 +128,6 @@ func publishHeartbeat() {
 
 func subscribeServerHeartbeat() {
 	var forever chan struct{}
-
-	fmt.Println("myServerHeartbeatQueue.Name: ", myServerHeartbeatQueue.Name)
 
 	msgs, err := rabbitmqChannel.Consume(
 		myServerHeartbeatQueue.Name, // queue
@@ -181,9 +145,6 @@ func subscribeServerHeartbeat() {
 	go func() {
 		for msg := range msgs {
 			serverIP := string(msg.Body)
-
-			fmt.Println(serverIP)
-
 			servers[serverIP] = time.Now()
 		}
 	}()
@@ -213,6 +174,7 @@ func subscribeServerMessage() {
 				continue
 			}
 
+			fmt.Println(res)
 			if res.Type == "user-status" {
 				uid := res.Payload["id"].(string)
 				online := res.Payload["online"].(bool)

@@ -17,11 +17,13 @@ func publishRmqMsg(res *Response) {
 	*newRes = *res
 	newRes.FromIP = os.Getenv("SELF_PRIVATE")
 
+	fmt.Println(res)
+
 	rmqMsgBytes, _ := json.Marshal(newRes)
 
 	for _, queue := range otherMessageQueues {
 		rabbitmqChannel.Publish(
-			rabbitMqExchangeName,
+			"",
 			queue.Name,
 			false,
 			false,
