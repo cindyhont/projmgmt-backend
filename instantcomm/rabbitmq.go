@@ -9,7 +9,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const rabbitMqExchangeName = "projmgmt"
+const rabbitMqExchangeName = "" //"projmgmt"
 
 func heartbeatQueueName(ip string) string {
 	return fmt.Sprintf("projmgmt-server-heartbeat-%s", ip)
@@ -39,18 +39,18 @@ func runRabbitmq() {
 	}
 	defer rabbitmqChannel.Close()
 
-	err = rabbitmqChannel.ExchangeDeclare(
-		rabbitMqExchangeName,
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		panic(err)
-	}
+	// err = rabbitmqChannel.ExchangeDeclare(
+	// 	rabbitMqExchangeName,
+	// 	"direct",
+	// 	true,
+	// 	false,
+	// 	false,
+	// 	false,
+	// 	nil,
+	// )
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	for _, serverIP := range ips {
 		if serverIP == thisServerIP {
@@ -154,7 +154,7 @@ func publishHeartbeat() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(os.Getenv("SELF_PRIVATE"))
+			fmt.Println("SELF_PRIVATE: ", os.Getenv("SELF_PRIVATE"))
 		}
 		time.Sleep(time.Second)
 	}
