@@ -2,6 +2,7 @@ package instantcomm
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 
@@ -201,6 +202,7 @@ func subscribeServerHeartbeat() {
 		for msg := range msgs {
 			serverIP := string(msg.Body)
 			servers[serverIP] = time.Now()
+			fmt.Println(serverIP, time.Now())
 		}
 	}()
 	<-forever
