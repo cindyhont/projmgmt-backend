@@ -104,9 +104,21 @@ func runRabbitmq() {
 
 			go subscribeServerMessage()
 		} else {
-			go publishHeartbeat(serverIP)
+			hbQueue, err := rabbitmqChannel.QueueDeclare(
+				heartbeatQueueName(serverIP),
+				true,
+				false,
+				false,
+				false,
+				nil,
+			)
+			if err != nil {
+				panic(err)
+			}
 
-			queue, err := rabbitmqChannel.QueueDeclare(
+			otherServerHeartbeatQueues = append(otherServerHeartbeatQueues, hbQueue)
+
+			mQueue, err := rabbitmqChannel.QueueDeclare(
 				messageQueueName(serverIP),
 				true,
 				false,
@@ -118,41 +130,31 @@ func runRabbitmq() {
 				panic(err)
 			}
 
-			otherMessageQueues = append(otherMessageQueues, queue)
+			otherMessageQueues = append(otherMessageQueues, mQueue)
 		}
 	}
 
+	go publishHeartbeat()
 	checkServerWorking()
 }
 
-func publishHeartbeat(ip string) {
-	queue, err := rabbitmqChannel.QueueDeclare(
-		heartbeatQueueName(ip),
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		panic(err)
-	}
-
+func publishHeartbeat() {
 	thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
-
 	for {
-		err := rabbitmqChannel.Publish(
-			rabbitMqExchangeName,
-			queue.Name,
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        thisServerIpBytes,
-			},
-		)
-		if err != nil {
-			panic(err)
+		for _, queue := range otherServerHeartbeatQueues {
+			err := rabbitmqChannel.Publish(
+				rabbitMqExchangeName,
+				queue.Name,
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        thisServerIpBytes,
+				},
+			)
+			if err != nil {
+				panic(err)
+			}
 		}
 		time.Sleep(time.Second)
 	}
