@@ -131,8 +131,8 @@ func runRabbitmq() {
 		}
 	}
 
-	go subscribeServerHeartbeat()
 	go publishHeartbeat()
+	go subscribeServerHeartbeat()
 	go subscribeServerMessage()
 	checkServerWorking()
 }
@@ -162,6 +162,8 @@ func publishHeartbeat() {
 
 func subscribeServerHeartbeat() {
 	var forever chan struct{}
+
+	fmt.Println("myServerHeartbeatQueue.Name: ", myServerHeartbeatQueue.Name)
 
 	msgs, err := rabbitmqChannel.Consume(
 		myServerHeartbeatQueue.Name, // queue
