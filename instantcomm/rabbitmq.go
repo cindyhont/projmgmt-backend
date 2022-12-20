@@ -75,7 +75,6 @@ func runRabbitmq() {
 			if err != nil {
 				panic(err)
 			}
-			go subscribeServerHeartbeat()
 
 			///////////////
 
@@ -101,8 +100,6 @@ func runRabbitmq() {
 			if err != nil {
 				panic(err)
 			}
-
-			go subscribeServerMessage()
 		} else {
 			hbQueue, err := rabbitmqChannel.QueueDeclare(
 				heartbeatQueueName(serverIP),
@@ -134,7 +131,9 @@ func runRabbitmq() {
 		}
 	}
 
+	go subscribeServerHeartbeat()
 	go publishHeartbeat()
+	go subscribeServerMessage()
 	checkServerWorking()
 }
 
