@@ -1,8 +1,14 @@
 package instantcomm
 
-const rabbitMqExchangeName = "projmgmt"
+import (
+	"encoding/json"
+	"os"
+	"time"
 
-/*
+	"github.com/streadway/amqp"
+)
+
+const rabbitMqExchangeName = "projmgmt"
 
 func runRabbitmq() {
 	conn, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
@@ -213,5 +219,3 @@ func checkServerWorking() {
 		time.Sleep(interval)
 	}
 }
-
-*/
