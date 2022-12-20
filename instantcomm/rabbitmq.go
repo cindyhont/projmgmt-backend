@@ -122,7 +122,7 @@ func runRabbitmq() {
 		}
 	}
 
-	go checkServerWorking()
+	checkServerWorking()
 }
 
 func publishHeartbeat(ip string) {
