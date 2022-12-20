@@ -14,6 +14,7 @@ const rabbitMqExchangeName = "projmgmt"
 func runRabbitmq() {
 	conn, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 	defer conn.Close()
