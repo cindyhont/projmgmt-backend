@@ -39,18 +39,18 @@ func runRabbitmq() {
 	}
 	defer rabbitmqChannel.Close()
 
-	// err = rabbitmqChannel.ExchangeDeclare(
-	// 	rabbitMqExchangeName,
-	// 	"direct",
-	// 	true,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	nil,
-	// )
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err = rabbitmqChannel.ExchangeDeclare(
+		rabbitMqExchangeName,
+		"direct",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		panic(err)
+	}
 
 	for _, serverIP := range ips {
 		if serverIP == thisServerIP {
@@ -65,16 +65,16 @@ func runRabbitmq() {
 			if err != nil {
 				panic(err)
 			}
-			err = rabbitmqChannel.QueueBind(
-				myServerHeartbeatQueue.Name,
-				"",
-				rabbitMqExchangeName,
-				false,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
+			// err = rabbitmqChannel.QueueBind(
+			// 	myServerHeartbeatQueue.Name,
+			// 	"",
+			// 	rabbitMqExchangeName,
+			// 	false,
+			// 	nil,
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 
 			///////////////
 
@@ -90,16 +90,16 @@ func runRabbitmq() {
 				panic(err)
 			}
 
-			err = rabbitmqChannel.QueueBind(
-				myMessageQueue.Name,
-				"",
-				rabbitMqExchangeName,
-				false,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
+			// err = rabbitmqChannel.QueueBind(
+			// 	myMessageQueue.Name,
+			// 	"",
+			// 	rabbitMqExchangeName,
+			// 	false,
+			// 	nil,
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 		} else {
 			hbQueue, err := rabbitmqChannel.QueueDeclare(
 				heartbeatQueueName(serverIP),
