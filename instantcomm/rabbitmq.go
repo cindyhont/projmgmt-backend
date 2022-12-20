@@ -79,30 +79,30 @@ func runRabbitmq() {
 
 			///////////////
 
-			myMessageQueue, err = rabbitmqChannel.QueueDeclare(
-				messageQueueName(serverIP),
-				true,
-				false,
-				false,
-				false,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
+			// myMessageQueue, err = rabbitmqChannel.QueueDeclare(
+			// 	messageQueueName(serverIP),
+			// 	true,
+			// 	false,
+			// 	false,
+			// 	false,
+			// 	nil,
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 
-			err = rabbitmqChannel.QueueBind(
-				myMessageQueue.Name,
-				"",
-				rabbitMqExchangeName,
-				false,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
+			// err = rabbitmqChannel.QueueBind(
+			// 	myMessageQueue.Name,
+			// 	"",
+			// 	rabbitMqExchangeName,
+			// 	false,
+			// 	nil,
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 
-			go subscribeServerMessage()
+			// go subscribeServerMessage()
 		} else {
 			hbQueue, err := rabbitmqChannel.QueueDeclare(
 				heartbeatQueueName(serverIP),
@@ -118,19 +118,19 @@ func runRabbitmq() {
 
 			otherServerHeartbeatQueues = append(otherServerHeartbeatQueues, hbQueue)
 
-			mQueue, err := rabbitmqChannel.QueueDeclare(
-				messageQueueName(serverIP),
-				true,
-				false,
-				false,
-				false,
-				nil,
-			)
-			if err != nil {
-				panic(err)
-			}
+			// mQueue, err := rabbitmqChannel.QueueDeclare(
+			// 	messageQueueName(serverIP),
+			// 	true,
+			// 	false,
+			// 	false,
+			// 	false,
+			// 	nil,
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 
-			otherMessageQueues = append(otherMessageQueues, mQueue)
+			// otherMessageQueues = append(otherMessageQueues, mQueue)
 		}
 	}
 
