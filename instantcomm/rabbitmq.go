@@ -2,7 +2,6 @@ package instantcomm
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"time"
 
@@ -14,14 +13,12 @@ const rabbitMqExchangeName = "projmgmt"
 func runRabbitmq() {
 	conn, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
-		fmt.Println("a: ", err)
 		panic(err)
 	}
 	defer conn.Close()
 
 	rabbitmqChannel, err = conn.Channel()
 	if err != nil {
-		fmt.Println("b: ", err)
 		panic(err)
 	}
 	defer rabbitmqChannel.Close()
@@ -36,7 +33,6 @@ func runRabbitmq() {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("c: ", err)
 		panic(err)
 	}
 
@@ -49,7 +45,6 @@ func runRabbitmq() {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("d: ", err)
 		panic(err)
 	}
 
@@ -61,7 +56,6 @@ func runRabbitmq() {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("e: ", err)
 		panic(err)
 	}
 
@@ -74,7 +68,6 @@ func runRabbitmq() {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("f: ", err)
 		panic(err)
 	}
 
@@ -86,7 +79,6 @@ func runRabbitmq() {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("g: ", err)
 		panic(err)
 	}
 	go publishHeartbeat()
@@ -96,7 +88,6 @@ func runRabbitmq() {
 }
 
 func subscribeServerMessage() {
-	fmt.Println("subscribing message queue")
 	var forever chan struct{}
 
 	msgs, err := rabbitmqChannel.Consume(
@@ -191,7 +182,6 @@ func publishHeartbeat() {
 }
 
 func subscribeServerHeartbeat() {
-	fmt.Println("subscribing heartbeat")
 	var forever chan struct{}
 
 	msgs, err := rabbitmqChannel.Consume(
