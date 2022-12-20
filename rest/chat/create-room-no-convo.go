@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -49,7 +49,7 @@ func createRoomNoConvo(
 
 	userIDs := []string{uid, roommateID}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_new-room-no-convo",
 		Payload: map[string]interface{}{
 			"id":    data.RoomID,
@@ -57,7 +57,7 @@ func createRoomNoConvo(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &userIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &userIDs)
 
 	json.NewEncoder(w).Encode(data)
 }

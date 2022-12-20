@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -50,13 +50,13 @@ func deleteCustomField(
 	database.DB.Exec("DELETE FROM task_custom_user_fields WHERE id = $1", req.FieldID)
 	database.DB.Exec("UPDATE task_custom_user_field_values SET values = values - $1 WHERE uid = $2", req.FieldID, uid)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_delete-custom-field",
 		Payload: map[string]interface{}{
 			"fieldID": req.FieldID,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

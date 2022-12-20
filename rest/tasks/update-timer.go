@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/common"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -82,12 +82,12 @@ func updateTimer(
 	// fmt.Println(wsPayload)
 	// fmt.Println(wsUserIDs)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type:    "tasks_update-timer",
 		Payload: wsPayload,
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&wsUserIDs))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&wsUserIDs))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

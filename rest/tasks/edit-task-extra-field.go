@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -57,7 +57,7 @@ func editTaskExtraField(
 		return
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_edit-extra-field",
 		Payload: map[string]interface{}{
 			"taskID": req.TaskID,
@@ -65,7 +65,7 @@ func editTaskExtraField(
 			"value":  req.Value,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

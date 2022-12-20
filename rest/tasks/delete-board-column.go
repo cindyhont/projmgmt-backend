@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -150,7 +150,7 @@ func deleteBoardColumn(
 		fmt.Println("b:", err)
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_delete-board-column",
 		Payload: map[string]interface{}{
 			"boardColumnIdToDelete": req.ColumnIdToDelete,
@@ -158,7 +158,7 @@ func deleteBoardColumn(
 			"newDefault":            req.NewDefault,
 		},
 	}
-	data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid}))
+	data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid}))
 
 	data.Success = true
 	json.NewEncoder(w).Encode(data)

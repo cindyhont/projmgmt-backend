@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -78,7 +78,7 @@ func createRoomWithFirstConvo(
 		return
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_new-room-w-convo",
 		Payload: map[string]interface{}{
 			"roomID":  data.RoomID,
@@ -90,7 +90,7 @@ func createRoomWithFirstConvo(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &users)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &users)
 
 	json.NewEncoder(w).Encode(data)
 }

@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/googleservice"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -76,7 +76,7 @@ func editComment(
 		req.CommentID,
 	)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_edit-comment",
 		Payload: map[string]interface{}{
 			"id":             req.CommentID,
@@ -87,7 +87,7 @@ func editComment(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

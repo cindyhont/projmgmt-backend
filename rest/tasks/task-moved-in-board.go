@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -204,7 +204,7 @@ func taskMovedInBoard(
 		fmt.Println(err)
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_task-moved-in-board",
 		Payload: map[string]interface{}{
 			"taskID":         req.TaskID,
@@ -214,7 +214,7 @@ func taskMovedInBoard(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 
 	json.NewEncoder(w).Encode(data)

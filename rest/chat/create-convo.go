@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/googleservice"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -89,7 +89,7 @@ func createConvo(
 		}
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_new-convo",
 		Payload: map[string]interface{}{
 			"id":             req.Convo.ConvoID,
@@ -105,7 +105,7 @@ func createConvo(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, userIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, userIDs)
 
 	json.NewEncoder(w).Encode(data)
 }

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -61,7 +61,7 @@ func editConvo(
 
 	userIDs := getChatRoomUserIDs(roomid)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_edit-convo",
 		Payload: map[string]interface{}{
 			"roomid":  roomid,
@@ -71,7 +71,7 @@ func editConvo(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, userIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, userIDs)
 
 	data.Success = true
 	json.NewEncoder(w).Encode(data)

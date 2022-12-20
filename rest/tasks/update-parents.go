@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/common"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -125,7 +125,7 @@ func updateParents(
 	userIDs = append(userIDs, *getParentChildTasksUserIDs(req.TaskID)...)
 	userIDs = append(userIDs, *getTaskUserIDs(req.TaskID)...)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_update-parents",
 		Payload: map[string]interface{}{
 			"taskID":  req.TaskID,
@@ -133,7 +133,7 @@ func updateParents(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&userIDs))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&userIDs))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/common"
 	"github.com/cindyhont/projmgmt-backend/rest/googleservice"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -223,7 +223,7 @@ func addTask(
 
 	for _, userID := range userIDs {
 		if userID == uid {
-			wsMessage := websocket.Response{
+			wsMessage := instantcomm.Response{
 				Type: "tasks_add-task",
 				Payload: map[string]interface{}{
 					"task":          taskMap,
@@ -231,7 +231,7 @@ func addTask(
 					"files":         req.Files,
 				},
 			}
-			data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &[]string{userID}))
+			data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{userID}))
 		} else {
 			_, err = database.DB.Exec(`
 				with get_order_in_board_column as (
@@ -301,7 +301,7 @@ func addTask(
 			var extraFieldObj map[string]interface{}
 			json.Unmarshal([]byte(s), &extraFieldObj)
 
-			wsMessage := websocket.Response{
+			wsMessage := instantcomm.Response{
 				Type: "tasks_add-task",
 				Payload: map[string]interface{}{
 					"task":          taskMap,
@@ -309,17 +309,17 @@ func addTask(
 					"files":         req.Files,
 				},
 			}
-			data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &[]string{userID}))
+			data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{userID}))
 		}
 	}
 
 	parentChildTaskUserIDs := *getParentChildTasksUserIDs(req.Task.ID)
 	if len(parentChildTaskUserIDs) != 0 {
-		wsMessage := websocket.Response{
+		wsMessage := instantcomm.Response{
 			Type:    "tasks_new-parent-child-task",
 			Payload: taskMap,
 		}
-		data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &parentChildTaskUserIDs))
+		data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &parentChildTaskUserIDs))
 	}
 
 	json.NewEncoder(w).Encode(data)

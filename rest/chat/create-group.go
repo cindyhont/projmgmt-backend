@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/julienschmidt/httprouter"
@@ -96,7 +96,7 @@ func createGroup(
 	userIDs = append(userIDs, req.Users...)
 	userIDs = append(userIDs, uid)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_new-group",
 		Payload: map[string]interface{}{
 			"roomID": data.RoomID,
@@ -106,7 +106,7 @@ func createGroup(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &userIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &userIDs)
 
 	json.NewEncoder(w).Encode(data)
 }

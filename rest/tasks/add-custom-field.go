@@ -8,8 +8,8 @@ import (
 	"reflect"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -72,11 +72,11 @@ func addCustomField(
 	var wsPayload map[string]interface{}
 	json.Unmarshal(body, &wsPayload)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type:    "tasks_add-custom-field",
 		Payload: wsPayload,
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

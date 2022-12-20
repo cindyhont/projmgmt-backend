@@ -1,100 +1,42 @@
-package websocket
+package instantcomm
 
 import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"net/http"
+	"os"
 
 	"github.com/cindyhont/projmgmt-backend/database"
-	"github.com/cindyhont/projmgmt-backend/router"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
-	"github.com/julienschmidt/httprouter"
+	"github.com/streadway/amqp"
 )
 
-var users = map[string]map[*net.Conn]bool{}
+func publishRmqMsg(res *Response) {
+	newRes := new(Response)
+	*newRes = *res
+	newRes.FromIP = os.Getenv("SELF_PRIVATE")
 
-func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var uid string
+	rmqMsgBytes, _ := json.Marshal(newRes)
 
-	if !originOK(req) {
-		return
-	}
-
-	myConn, _, _, err := ws.UpgradeHTTP(req, res)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	go func() {
-		defer closeConnection(&myConn)
-
-		var (
-			r       = wsutil.NewReader(myConn, ws.StateServerSide)
-			decoder = json.NewDecoder(r)
-		)
-
-		for {
-			hdr, err := r.NextFrame()
-			if err != nil {
-				CleanOldWsRecords()
-				return
-			}
-
-			if hdr.OpCode == ws.OpClose {
-				if uid != "" && len(users[uid]) == 1 {
-					go announceUserStatus(uid, false)
-				}
-			}
-
-			var req request
-			if err := decoder.Decode(&req); err != nil {
-				CleanOldWsRecords()
-				return
-			}
-
-			if req.Request == "" && len(req.Requests) == 0 {
-				CleanOldWsRecords()
-				return
-			}
-
-			if req.Request == "online-users" && req.UserID != "" {
-				if checkUserExists(req.UserID) {
-					uid = req.UserID
-					if _, keyAlreadyExists := users[uid]; keyAlreadyExists {
-						users[uid][&myConn] = true
-					} else {
-						var user = make(map[*net.Conn]bool)
-						user[&myConn] = true
-						users[uid] = user
-					}
-					go sendOnlineUserList(&myConn, uid)
-					go announceUserStatus(uid, true)
-				} else {
-					return
-				}
-			} else if req.Request == "chat_typing" && uid != "" {
-				updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
-			} else if req.Request != "" {
-				go dispatchMsgFromDB(&myConn, req.Request)
-			} else if len(req.Requests) != 0 {
-				for _, wsid := range req.Requests {
-					go dispatchMsgFromDB(&myConn, wsid)
-				}
-			}
-			CleanOldWsRecords()
-		}
-	}()
+	rabbitmqChannel.Publish(
+		rabbitMqExchangeName,
+		serverHeartbeatQueue.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        rmqMsgBytes,
+		},
+	)
 }
 
 func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 	for _, uid := range *userIDs {
-		if _, userIsOnline := users[uid]; userIsOnline {
-			connMap := users[uid]
+		if _, userIsOnline := wsUsers[uid]; userIsOnline {
+			connMap := wsUsers[uid]
 			for conn := range connMap {
-				if conn == myConn {
+				if myConn != nil && conn == myConn {
 					continue
 				}
 				if err := dispatchIndividualMessage(conn, res); err != nil {
@@ -104,6 +46,9 @@ func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 			}
 		}
 	}
+
+	res.UserIDs = *userIDs
+	publishRmqMsg(res)
 }
 
 func updateChatRoomTyping(chatroomID string, uid string, typing bool, myConn *net.Conn) {
@@ -139,9 +84,22 @@ func updateChatRoomTyping(chatroomID string, uid string, typing bool, myConn *ne
 
 func sendOnlineUserList(myConn *net.Conn, userID string) {
 	userIDs := make([]string, 0)
-	for uid := range users {
+	userIdMap := map[string]bool{}
+
+	for _, userConnCounts := range otherServersConn {
+		for userid := range userConnCounts {
+			userIdMap[userid] = true
+		}
+	}
+
+	for userid := range wsUsers {
+		userIdMap[userid] = true
+	}
+
+	for uid := range userIdMap {
 		userIDs = append(userIDs, uid)
 	}
+
 	if len(userIDs) == 0 {
 		return
 	}
@@ -174,21 +132,26 @@ func dispatchIndividualMessage(conn *net.Conn, res *Response) error {
 	return nil
 }
 
+func toAllRecipients(res *Response, myConn *net.Conn) {
+	for _, connMap := range wsUsers {
+		for conn := range connMap {
+			if myConn != nil && conn == myConn {
+				continue
+			}
+			if err := dispatchIndividualMessage(conn, res); err != nil {
+				fmt.Println(err)
+				return
+			}
+		}
+	}
+}
+
 func dispatchMsgFromDB(myConn *net.Conn, reqID string) {
 	res := getReqestContent(reqID)
 
 	if res.ToAllRecipients {
-		for _, connMap := range users {
-			for conn := range connMap {
-				if conn == myConn {
-					continue
-				}
-				if err := dispatchIndividualMessage(conn, res); err != nil {
-					fmt.Println(err)
-					return
-				}
-			}
-		}
+		toAllRecipients(res, myConn)
+		publishRmqMsg(res)
 	} else {
 		userIDs := getReqestReceivers(reqID)
 		toSelectedUsers(userIDs, res, myConn)
@@ -244,7 +207,7 @@ func announceUserStatus(uid string, online bool) {
 		},
 	}
 
-	for user, connMap := range users {
+	for user, connMap := range wsUsers {
 		if user == uid {
 			continue
 		}
@@ -255,22 +218,21 @@ func announceUserStatus(uid string, online bool) {
 			}
 		}
 	}
+
+	res.ToAllRecipients = true
+	publishRmqMsg(&res)
 }
 
 func closeConnection(myConn *net.Conn) {
-	for user, connMap := range users {
+	for user, connMap := range wsUsers {
 		for conn := range connMap {
 			if conn == myConn {
-				delete(users[user], conn)
-				if len(users[user]) == 0 {
-					delete(users, user)
+				delete(wsUsers[user], conn)
+				if len(wsUsers[user]) == 0 {
+					delete(wsUsers, user)
 				}
 			}
 		}
 	}
 	(*myConn).Close()
-}
-
-func RunWS() {
-	router.Router.GET("/ws", runWS)
 }

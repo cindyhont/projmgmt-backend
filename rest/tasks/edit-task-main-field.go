@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/common"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -307,7 +307,7 @@ func editTaskMainField(
 		}
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_edit-main-field",
 		Payload: map[string]interface{}{
 			"taskID":     req.TaskID,
@@ -321,12 +321,12 @@ func editTaskMainField(
 	allUsers = append(allUsers, userIDs...)
 	allUsers = append(allUsers, existingUserIDs...)
 
-	data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&allUsers)))
+	data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, common.UniqueStringFromSlice(&allUsers)))
 
 	if req.Field == "name" || req.Field == "approval" || req.Field == "owner" {
 		parentChildTaskUserIDs := *getParentChildTasksUserIDs(req.TaskID)
 		if len(parentChildTaskUserIDs) != 0 {
-			wsMessage := websocket.Response{
+			wsMessage := instantcomm.Response{
 				Type: "tasks_parent-child-task",
 				Payload: map[string]interface{}{
 					"taskID": req.TaskID,
@@ -334,7 +334,7 @@ func editTaskMainField(
 					"value":  req.Value,
 				},
 			}
-			data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &parentChildTaskUserIDs))
+			data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &parentChildTaskUserIDs))
 		}
 	}
 

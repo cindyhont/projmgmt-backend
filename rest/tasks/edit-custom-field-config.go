@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -61,7 +61,7 @@ func editCustomFieldConfig(
 		return
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_edit-custom-field-config",
 		Payload: map[string]interface{}{
 			"id":        req.ID,
@@ -69,7 +69,7 @@ func editCustomFieldConfig(
 			"details":   req.Details,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

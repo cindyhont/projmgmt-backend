@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/googleservice"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -86,14 +86,14 @@ func addComment(
 		arrayOrNil(&req.PublicFileIDs),
 	)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_add-comment",
 		Payload: map[string]interface{}{
 			"comment": req.Comment,
 			"files":   req.Files,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.Comment.TaskID))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.Comment.TaskID))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

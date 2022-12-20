@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -47,7 +47,7 @@ func updateLastSeen(
 
 	userIDs := getChatRoomUserIDs(rid)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_lastseen",
 		Payload: map[string]interface{}{
 			"uid":      uid,
@@ -55,7 +55,7 @@ func updateLastSeen(
 			"lastseen": time.Now().UnixMilli(),
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, userIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, userIDs)
 
 	data.Success = true
 	json.NewEncoder(w).Encode(data)

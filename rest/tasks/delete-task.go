@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -59,14 +59,14 @@ func deleteTask(
 			id = $1
 	`, req.TaskID)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_delete-task",
 		Payload: map[string]interface{}{
 			"taskID": req.TaskID,
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, existingUserIDs)
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, existingUserIDs)
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

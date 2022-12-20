@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -25,7 +25,7 @@ func fetchOldWsMessages(
 		return
 	}
 
-	data := make([]websocket.Response, 0)
+	data := make([]instantcomm.Response, 0)
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -42,7 +42,7 @@ func fetchOldWsMessages(
 		return
 	}
 
-	websocket.CleanOldWsRecords()
+	instantcomm.CleanOldWsRecords()
 
 	rows, err := database.DB.Query(`
 		SELECT
@@ -73,7 +73,7 @@ func fetchOldWsMessages(
 	defer rows.Close()
 
 	for rows.Next() {
-		var r websocket.Response
+		var r instantcomm.Response
 		var s string
 
 		rows.Scan(
@@ -88,29 +88,3 @@ func fetchOldWsMessages(
 
 	json.NewEncoder(w).Encode(data)
 }
-
-/*
-
-rows, err := database.DB.Query(`
-	SELECT
-		C.action_type,
-		C.payload
-	FROM
-		ws_message_content C
-	INNER JOIN
-		ws_message_to T
-	ON
-		C.id = T.message_id
-	WHERE
-		C.dt > current_timestamp - '1 hour'::interval
-	AND
-		(
-			to_all_recipients = TRUE
-			OR
-			T.uid = $1
-		)
-	ORDER BY
-		C.dt
-`, uid)
-
-*/

@@ -25,5 +25,6 @@ require (
 require (
 	github.com/gobwas/ws v1.1.0
 	github.com/google/uuid v1.3.0
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/sys v0.2.0 // indirect
 )

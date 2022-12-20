@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -56,7 +56,7 @@ func updateMarkAsRead(
 		return
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "chat_markasread",
 		Payload: map[string]interface{}{
 			"roomid":     req.RoomID,
@@ -64,7 +64,7 @@ func updateMarkAsRead(
 		},
 	}
 
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, &[]string{uid})
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, &[]string{uid})
 
 	data.Success = true
 	json.NewEncoder(w).Encode(data)

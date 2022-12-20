@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -149,7 +149,7 @@ func forwardConvo(
 			userIDs = append(userIDs, s)
 		}
 
-		wsMessage := websocket.Response{
+		wsMessage := instantcomm.Response{
 			Type: "chat_new-convo",
 			Payload: map[string]interface{}{
 				"id":             room.ConvoID,
@@ -164,7 +164,7 @@ func forwardConvo(
 			},
 		}
 
-		data.WsRequestIDs = append(data.WsRequestIDs, websocket.SaveWsMessageInDB(&wsMessage, &userIDs))
+		data.WsRequestIDs = append(data.WsRequestIDs, instantcomm.SaveWsMessageInDB(&wsMessage, &userIDs))
 	}
 
 	data.Success = true

@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/rest"
 	"github.com/cindyhont/projmgmt-backend/router"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 )
 
 func init() {
@@ -16,6 +16,6 @@ func init() {
 
 func main() {
 	rest.ListenHTTP()
-	websocket.RunWS()
+	instantcomm.Run()
 	router.Listen()
 }

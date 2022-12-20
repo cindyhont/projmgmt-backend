@@ -1,4 +1,4 @@
-package websocket
+package instantcomm
 
 import (
 	"net/http"

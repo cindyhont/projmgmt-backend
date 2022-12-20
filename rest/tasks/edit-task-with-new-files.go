@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
 	"github.com/cindyhont/projmgmt-backend/rest/googleservice"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lib/pq"
 )
@@ -88,7 +88,7 @@ func editTaskWithNewFiles(
 		)
 	}
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_edit-task-with-new-files",
 		Payload: map[string]interface{}{
 			"taskID":       req.TaskID,
@@ -97,7 +97,7 @@ func editTaskWithNewFiles(
 			"uid":          uid,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

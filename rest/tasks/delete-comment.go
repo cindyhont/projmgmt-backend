@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/cindyhont/projmgmt-backend/database"
+	"github.com/cindyhont/projmgmt-backend/instantcomm"
 	"github.com/cindyhont/projmgmt-backend/model"
-	"github.com/cindyhont/projmgmt-backend/websocket"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -52,14 +52,14 @@ func deleteComment(
 
 	database.DB.Exec("UPDATE task_comments SET deleted = TRUE, delete_time = $1 WHERE id = $2", time.UnixMilli(req.DateTime), req.ID)
 
-	wsMessage := websocket.Response{
+	wsMessage := instantcomm.Response{
 		Type: "tasks_delete-comment",
 		Payload: map[string]interface{}{
 			"id":   req.ID,
 			"time": req.DateTime,
 		},
 	}
-	data.WsRequestID = websocket.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
+	data.WsRequestID = instantcomm.SaveWsMessageInDB(&wsMessage, getTaskUserIDs(req.TaskID))
 	data.Success = true
 	json.NewEncoder(w).Encode(data)
 }

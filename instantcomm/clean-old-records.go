@@ -1,4 +1,4 @@
-package websocket
+package instantcomm
 
 import "github.com/cindyhont/projmgmt-backend/database"
 
