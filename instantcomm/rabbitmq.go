@@ -185,7 +185,7 @@ func publishHeartbeat() {
 
 func subscribeServerHeartbeat() {
 	var forever chan struct{}
-	selfIP := os.Getenv("SELF_PRIVATE")
+	// selfIP := os.Getenv("SELF_PRIVATE")
 
 	msgs, err := rabbitmqChannel.Consume(
 		serverHeartbeatQueue.Name, // queue
@@ -203,12 +203,13 @@ func subscribeServerHeartbeat() {
 	go func() {
 		for msg := range msgs {
 			serverIP := string(msg.Body)
-			if serverIP == selfIP {
-				continue
-			} else {
-				// servers[serverIP] = time.Now()
-				fmt.Println(serverIP, time.Now())
-			}
+			fmt.Println(serverIP)
+			// if serverIP == selfIP {
+			// 	continue
+			// } else {
+			// 	// servers[serverIP] = time.Now()
+			// 	fmt.Println(serverIP, time.Now())
+			// }
 		}
 	}()
 	<-forever
