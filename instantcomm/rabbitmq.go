@@ -135,34 +135,41 @@ func runRabbitmq() {
 	}
 
 	go publishHeartbeat()
-	checkServerWorking()
+	// checkServerWorking()
 }
 
 func publishHeartbeat() {
-	thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
-	for {
-		for _, queue := range otherServerHeartbeatQueues {
 
-			fmt.Println("publishHeartbeat, queue.Name: ", queue.Name, time.Now())
-			fmt.Println("publishHeartbeat, selfIP: ", os.Getenv("SELF_PRIVATE"))
-			fmt.Println("")
-
-			err := rabbitmqChannel.Publish(
-				rabbitMqExchangeName,
-				queue.Name,
-				false,
-				false,
-				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:        thisServerIpBytes,
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
-		}
-		time.Sleep(time.Second)
+	for _, queue := range otherServerHeartbeatQueues {
+		fmt.Println(queue.Name)
 	}
+
+	/*
+		thisServerIpBytes := []byte(os.Getenv("SELF_PRIVATE"))
+		for {
+			for _, queue := range otherServerHeartbeatQueues {
+
+				fmt.Println("publishHeartbeat, queue.Name: ", queue.Name, time.Now())
+				fmt.Println("publishHeartbeat, selfIP: ", os.Getenv("SELF_PRIVATE"))
+				fmt.Println("")
+
+				err := rabbitmqChannel.Publish(
+					rabbitMqExchangeName,
+					queue.Name,
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "text/plain",
+						Body:        thisServerIpBytes,
+					},
+				)
+				if err != nil {
+					panic(err)
+				}
+			}
+			time.Sleep(time.Second)
+		}
+	*/
 }
 
 func subscribeServerHeartbeat() {
