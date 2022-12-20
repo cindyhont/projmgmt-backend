@@ -39,18 +39,18 @@ func runRabbitmq() {
 	}
 	defer rabbitmqChannel.Close()
 
-	err = rabbitmqChannel.ExchangeDeclare(
-		rabbitMqExchangeName,
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		panic(err)
-	}
+	// err = rabbitmqChannel.ExchangeDeclare(
+	// 	rabbitMqExchangeName,
+	// 	"direct",
+	// 	true,
+	// 	false,
+	// 	false,
+	// 	false,
+	// 	nil,
+	// )
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	for _, serverIP := range ips {
 		if serverIP == thisServerIP {
