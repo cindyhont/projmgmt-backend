@@ -19,16 +19,18 @@ func publishRmqMsg(res *Response) {
 
 	rmqMsgBytes, _ := json.Marshal(newRes)
 
-	rabbitmqChannel.Publish(
-		rabbitMqExchangeName,
-		serverHeartbeatQueue.Name,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        rmqMsgBytes,
-		},
-	)
+	for _, queue := range otherMessageQueues {
+		rabbitmqChannel.Publish(
+			rabbitMqExchangeName,
+			queue.Name,
+			false,
+			false,
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        rmqMsgBytes,
+			},
+		)
+	}
 }
 
 func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
