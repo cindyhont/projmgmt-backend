@@ -4,39 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/cindyhont/projmgmt-backend/database"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
-	"github.com/streadway/amqp"
 )
-
-func publishRmqMsg(res *Response) {
-	// return if in dev mode
-	if os.Getenv("SELF_PRIVATE") == "" {
-		return
-	}
-
-	newRes := new(Response)
-	*newRes = *res
-	newRes.FromIP = os.Getenv("SELF_PRIVATE")
-
-	rmqMsgBytes, _ := json.Marshal(newRes)
-
-	for _, queue := range otherMessageQueues {
-		rabbitmqChannel.Publish(
-			"",
-			queue.Name,
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        rmqMsgBytes,
-			},
-		)
-	}
-}
 
 func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 	for _, uid := range *userIDs {
@@ -55,7 +27,6 @@ func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 	}
 
 	res.UserIDs = *userIDs
-	publishRmqMsg(res)
 }
 
 func updateChatRoomTyping(chatroomID string, uid string, typing bool, myConn *net.Conn) {
@@ -158,7 +129,6 @@ func dispatchMsgFromDB(myConn *net.Conn, reqID string) {
 
 	if res.ToAllRecipients {
 		toAllRecipients(res, myConn)
-		publishRmqMsg(res)
 	} else {
 		userIDs := getReqestReceivers(reqID)
 		toSelectedUsers(userIDs, res, myConn)
@@ -227,7 +197,6 @@ func announceUserStatus(uid string, online bool) {
 	}
 
 	res.ToAllRecipients = true
-	publishRmqMsg(&res)
 }
 
 func closeConnection(myConn *net.Conn) {
