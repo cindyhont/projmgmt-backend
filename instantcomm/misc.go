@@ -13,6 +13,11 @@ import (
 )
 
 func publishRmqMsg(res *Response) {
+	// return if in dev mode
+	if os.Getenv("SELF_PRIVATE") == "" {
+		return
+	}
+
 	newRes := new(Response)
 	*newRes = *res
 	newRes.FromIP = os.Getenv("SELF_PRIVATE")

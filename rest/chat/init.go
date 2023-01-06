@@ -41,23 +41,24 @@ type FileInputEntity struct {
 }
 
 type Room struct {
-	ID             string          `json:"id"`
-	Name           string          `json:"name"`
-	Avatar         string          `json:"avatar"`
-	IsGroup        bool            `json:"isGroup"`
-	MarkAsRead     int             `json:"markAsRead"`
-	Pinned         bool            `json:"pinned"`
-	Convo          ConvoEntity     `json:"convos"`
-	User           RoomUserEntity  `json:"users"`
-	FileInputs     FileInputEntity `json:"fileInputs"`
-	Draft          string          `json:"draft"`
-	ReplyMsgID     string          `json:"replyMsgID"`
-	Reply          bool            `json:"reply"`
-	EditMsgID      string          `json:"editMsgID"`
-	Edit           bool            `json:"edit"`
-	ScrollY        int             `json:"scrollY"`
-	HasMoreConvos  bool            `json:"hasMoreConvos"`
-	FetchingConvos bool            `json:"fetchingConvos"`
+	ID                    string          `json:"id"`
+	Name                  string          `json:"name"`
+	Avatar                string          `json:"avatar"`
+	IsGroup               bool            `json:"isGroup"`
+	MarkAsRead            int             `json:"markAsRead"`
+	Pinned                bool            `json:"pinned"`
+	Convo                 ConvoEntity     `json:"convos"`
+	User                  RoomUserEntity  `json:"users"`
+	FileInputs            FileInputEntity `json:"fileInputs"`
+	Draft                 string          `json:"draft"`
+	ReplyMsgID            string          `json:"replyMsgID"`
+	Reply                 bool            `json:"reply"`
+	EditMsgID             string          `json:"editMsgID"`
+	Edit                  bool            `json:"edit"`
+	ScrollY               int             `json:"scrollY"`
+	HasMoreConvos         bool            `json:"hasMoreConvos"`
+	FetchingConvos        bool            `json:"fetchingConvos"`
+	ViewportLatestConvoID string          `json:"viewportLatestConvoID"`
 }
 
 type RoomEntity struct {
