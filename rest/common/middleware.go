@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -32,6 +33,7 @@ type AuthUrHandler func(
 )
 
 func sessionID(r *http.Request) (string, string) {
+	fmt.Println(r.RemoteAddr)
 	fetchSessionMethod := r.Header.Get("sMethod")
 	oldSessionID := ""
 	remoteAddr := strings.Split(r.RemoteAddr, ":")[0]
