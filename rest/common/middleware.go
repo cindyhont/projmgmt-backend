@@ -37,22 +37,29 @@ func sessionID(r *http.Request) (string, string) {
 	oldSessionID := ""
 	remoteAddr := strings.Split(r.RemoteAddr, ":")[0]
 	if fetchSessionMethod == "ck" {
-		pass := false
-		if os.Getenv("PROJMGMT_BACKEND_MODE") == "" {
-			// dev mode
-			pass = true
-		} else {
-			// production mode
-			pass = r.Header.Get("Origin") == os.Getenv("PROJMGMT_ORIGIN_REFERRER")
-			fmt.Println("origin: ", r.Header.Get("Origin"), ", url: ", r.URL)
+		fmt.Println("origin: ", r.Header.Get("Origin"), ", url: ", r.URL)
+		s, err := r.Cookie("sid")
+		if err == nil {
+			oldSessionID = s.Value
 		}
-
-		if pass {
-			s, err := r.Cookie("sid")
-			if err == nil {
-				oldSessionID = s.Value
+		/*
+			pass := false
+			if os.Getenv("PROJMGMT_BACKEND_MODE") == "" {
+				// dev mode
+				pass = true
+			} else {
+				// production mode
+				pass = r.Header.Get("Origin") == os.Getenv("PROJMGMT_ORIGIN_REFERRER")
+				fmt.Println("origin: ", r.Header.Get("Origin"), ", url: ", r.URL)
 			}
-		}
+
+			if pass {
+				s, err := r.Cookie("sid")
+				if err == nil {
+					oldSessionID = s.Value
+				}
+			}
+		*/
 	} else if fetchSessionMethod == "body" && (remoteAddr == os.Getenv("INSTANCE_A_PRIVATE") || remoteAddr == os.Getenv("INSTANCE_B_PRIVATE")) {
 		oldSessionID = r.Header.Get("sid")
 	}
