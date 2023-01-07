@@ -608,7 +608,6 @@ func Setup() {
 		os.Getenv("PROJMGMT_DEMO_USER_PASSWORD"),
 	)
 	if err != nil {
-		fmt.Println("a")
 		panic(err)
 	}
 
@@ -640,8 +639,8 @@ func Setup() {
 			'00000000-0000-0000-0000-000000000000',
 			'00000000-0000-0000-0000-000000000000',
 			15,
-			$4,
-			$5,
+			$2,
+			$3,
 			now(),
 			now(),
 			to_tsvector('Cindy Ho'),
