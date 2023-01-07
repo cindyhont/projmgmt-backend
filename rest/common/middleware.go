@@ -60,7 +60,7 @@ func sessionID(r *http.Request) (string, string) {
 
 func AuthRequired(next AuthHandler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		fmt.Println("origin: ", r.Header.Get("Origin"), " remoteAddress: ", r.RemoteAddr)
+		fmt.Println("origin: ", r.Header.Get("Origin"), ", remoteAddress: ", r.RemoteAddr, ", url: ", r.URL)
 		usermgmt.DeleteExpiredSessions()
 		fetchSessionMethod, oldSessionID := sessionID(r)
 
