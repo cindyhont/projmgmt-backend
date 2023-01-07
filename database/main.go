@@ -597,7 +597,7 @@ func Setup() {
 			password
 		) VALUES (
 			$1,
-			$2,
+			$2::text,
 			$3
 		)
 		ON CONFLICT (id) DO NOTHING;
