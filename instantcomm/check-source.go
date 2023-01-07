@@ -16,5 +16,5 @@ func checkUserExists(uid string) bool {
 }
 
 func originOK(req *http.Request) bool {
-	return req.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER")
+	return req.Header.Get("Origin") == os.Getenv("PROJMGMT_ORIGIN_REFERRER")
 }

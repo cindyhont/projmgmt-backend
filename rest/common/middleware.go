@@ -39,12 +39,12 @@ func sessionID(r *http.Request) (string, string) {
 	remoteAddr := strings.Split(r.RemoteAddr, ":")[0]
 	if fetchSessionMethod == "ck" {
 		pass := false
-		if os.Getenv("SELF_PRIVATE") == "" {
+		if os.Getenv("PROJMGMT_BACKEND_MODE") == "" {
 			// dev mode
 			pass = true
 		} else {
 			// production mode
-			pass = r.Header.Get("Origin") == os.Getenv("ORIGIN_REFERRER")
+			pass = r.Header.Get("Origin") == os.Getenv("PROJMGMT_ORIGIN_REFERRER")
 		}
 
 		if pass {
@@ -53,7 +53,7 @@ func sessionID(r *http.Request) (string, string) {
 				oldSessionID = s.Value
 			}
 		}
-	} else if fetchSessionMethod == "body" && remoteAddr == os.Getenv("INSTANCE_A_PRIVATE") {
+	} else if fetchSessionMethod == "body" && (remoteAddr == os.Getenv("INSTANCE_A_PRIVATE") || remoteAddr == os.Getenv("INSTANCE_B_PRIVATE")) {
 		oldSessionID = r.Header.Get("sid")
 	}
 	return fetchSessionMethod, oldSessionID

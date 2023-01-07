@@ -11,7 +11,7 @@ var DB *sql.DB
 
 func Setup() {
 	var err error
-	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	DB, err = sql.Open("postgres", os.Getenv("PROJMGMT_DATABASE_URL"))
 
 	if err != nil {
 		panic(err)

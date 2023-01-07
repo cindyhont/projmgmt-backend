@@ -18,7 +18,7 @@ func getToken(
 	r *http.Request,
 	p httprouter.Params,
 ) {
-	resp, err := http.Get(os.Getenv("GOOGLE_API_KEY_URL"))
+	resp, err := http.Get(os.Getenv("PROJMGMT_GOOGLE_API_KEY_URL"))
 	if err != nil {
 		fmt.Println(err)
 	}

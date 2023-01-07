@@ -139,7 +139,7 @@ func createVisitor(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	`,
 		chatRoomID,
 		uid,
-		os.Getenv("DEMO_USER"),
+		os.Getenv("PROJMGMT_DEMO_USER"),
 	)
 
 	database.DB.Exec(`
@@ -153,7 +153,7 @@ func createVisitor(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 			($1,$6,$2)
 	`,
 		chatRoomID,
-		os.Getenv("DEMO_USER"),
+		os.Getenv("PROJMGMT_DEMO_USER"),
 		fmt.Sprintf("<p>Hi %s! This chat app is similar to WhatsApp, Telegram, etc.</p>", req.FirstName),
 		"<p>On top of the main panel, you can search for other users or groups by typing the name of the user/group.</p>",
 		"<p>If you want to write to me, leave a message here with your contact information.</p>",

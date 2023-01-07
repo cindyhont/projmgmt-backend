@@ -70,7 +70,7 @@ func createGroup(
 		varStr = ",$4"
 
 		// here upload image to cloudinary
-		cld, _ := cloudinary.NewFromParams(os.Getenv("CLOUDINARY_CLOUD_NAME"), os.Getenv("CLOUDINARY_API_KEY"), os.Getenv("CLOUDINARY_API_SECRET"))
+		cld, _ := cloudinary.NewFromParams(os.Getenv("PROJMGMT_CLOUDINARY_CLOUD_NAME"), os.Getenv("PROJMGMT_CLOUDINARY_API_KEY"), os.Getenv("PROJMGMT_CLOUDINARY_API_SECRET"))
 		resp, err := cld.Upload.Upload(context.Background(), req.Avatar, uploader.UploadParams{})
 		if err != nil {
 			json.NewEncoder(w).Encode(data)
