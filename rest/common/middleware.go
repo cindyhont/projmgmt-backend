@@ -33,7 +33,7 @@ type AuthUrHandler func(
 )
 
 func sessionID(r *http.Request) (string, string) {
-	fmt.Println(r.RemoteAddr)
+	fmt.Println(r.Header.Get("sMethod"))
 	fetchSessionMethod := r.Header.Get("sMethod")
 	oldSessionID := ""
 	remoteAddr := strings.Split(r.RemoteAddr, ":")[0]
