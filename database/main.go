@@ -597,7 +597,7 @@ func Setup() {
 			password
 		) VALUES (
 			$1,
-			$2::text,
+			$2,
 			$3
 		)
 		ON CONFLICT (id) DO NOTHING;
@@ -649,7 +649,7 @@ func Setup() {
 		ON CONFLICT (id) DO NOTHING;
 	`,
 		os.Getenv("PROJMGMT_DEMO_USER"),
-		os.Getenv("PROJMGMT_DEMO_USERNAME"),
+		os.Getenv("PROJMGMT_DEMO_USER_EMAIL"),
 		os.Getenv("PROJMGMT_DEMO_USER_AVATAR"),
 	)
 	if err != nil {
