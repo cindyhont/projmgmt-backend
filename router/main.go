@@ -22,6 +22,7 @@ func testHttpsAPI(
 	r *http.Request,
 	p httprouter.Params,
 ) {
+	fmt.Println(r.Header.Get("Origin"))
 	json.NewEncoder(w).Encode(map[string]bool{"https-success": true})
 }
 
