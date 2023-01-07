@@ -351,6 +351,8 @@ func Setup() {
 					ON DELETE CASCADE
 			);
 
+			CREATE UNIQUE INDEX IF NOT EXISTS task_custom_user_fields_uid_type ON task_custom_user_fields USING btree ((uid::text || '_' || field_type));
+
 			INSERT INTO task_approval_list (id,name) VALUES
 				(0,'rejected'),
 				(25,'not submitted'),
@@ -586,6 +588,81 @@ func Setup() {
 			ON CONFLICT (id) DO NOTHING;
 		END;
 	`)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = DB.Exec(`
+		BEGIN;
+
+			INSERT INTO users (
+				id,
+				username,
+				password
+			) VALUES (
+				$1,
+				$2,
+				$3
+			)
+			ON CONFLICT (id) DO NOTHING;
+
+			INSERT INTO user_details (
+				id,
+				invitation_mail_key,
+				staff_id,
+				first_name,
+				last_name,
+				title,
+				department_id,
+				supervisor_id,
+				user_right,
+				email,
+				avatar,
+				date_registered_dt,
+				last_active_dt,
+				tsv,
+				max_child_task_level,
+				visitor
+			) VALUES (
+				$1,
+				NULL,
+				gen_random_uuid()::text,
+				'Cindy',
+				'Ho',
+				'',
+				'00000000-0000-0000-0000-000000000000',
+				'00000000-0000-0000-0000-000000000000',
+				15,
+				$4,
+				$5,
+				now(),
+				now(),
+				to_tsvector('Cindy Ho'),
+				5,
+				false
+			)
+			ON CONFLICT (id) DO NOTHING;
+
+			WITH source AS (
+				SELECT id, $1::uuid as uid, type_name, default_value FROM task_custom_field_type WHERE default_value IS NOT NULL
+			)
+			INSERT INTO
+				task_custom_user_fields
+				(uid,field_type,details,field_name)
+			SELECT
+				uid, id, default_value, type_name
+			FROM
+				source
+			ON CONFLICT ON CONSTRAINT task_custom_user_fields_uid_type DO NOTHING;
+
+		END;
+	`,
+		os.Getenv("PROJMGMT_DEMO_USER"),
+		os.Getenv("PROJMGMT_DEMO_USERNAME"),
+		os.Getenv("PROJMGMT_DEMO_USER_PASSWORD"),
+		os.Getenv("PROJMGMT_DEMO_USER_EMAIL"),
+		os.Getenv("PROJMGMT_DEMO_USER_AVATAR"),
+	)
 	if err != nil {
 		panic(err)
 	}
