@@ -336,6 +336,8 @@ func Setup() {
 					ON DELETE CASCADE
 			);
 
+			ALTER TABLE task_custom_user_fields ADD CONSTRAINT task_custom_user_fields_uid_type UNIQUE (uid,field_type);
+
 			CREATE TABLE IF NOT EXISTS task_custom_user_field_values (
 				uid uuid NOT NULL,
 				task_id uuid NOT NULL,
@@ -349,9 +351,6 @@ func Setup() {
 					ON UPDATE NO ACTION
 					ON DELETE CASCADE
 			);
-
-			CREATE UNIQUE INDEX IF NOT EXISTS task_custom_user_fields_uid_type ON task_custom_user_fields USING btree ((uid::text || '_' || field_type));
-			ALTER TABLE task_custom_user_fields ADD CONSTRAINT task_custom_user_fields_uid_type UNIQUE USING INDEX task_custom_user_fields_uid_type;
 
 			INSERT INTO task_approval_list (id,name) VALUES
 				(0,'rejected'),
