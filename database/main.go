@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -674,7 +673,6 @@ func Setup() {
 		os.Getenv("PROJMGMT_DEMO_USER"),
 	)
 	if err != nil {
-		fmt.Println("c")
 		panic(err)
 	}
 }
