@@ -44,11 +44,11 @@ func sessionID(r *http.Request) (string, string) {
 		} else {
 			// production mode
 			pass = r.Header.Get("Origin") == os.Getenv("PROJMGMT_ORIGIN_REFERRER")
+			fmt.Println("origin: ", r.Header.Get("Origin"), ", env referrer: ", os.Getenv("PROJMGMT_ORIGIN_REFERRER"))
 		}
 
 		if pass {
 			s, err := r.Cookie("sid")
-			fmt.Println("no err: ", err == nil)
 			if err == nil {
 				oldSessionID = s.Value
 			}
