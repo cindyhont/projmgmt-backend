@@ -544,6 +544,46 @@ func Setup() {
 				false
 			)
 			ON CONFLICT (id) DO NOTHING;
+
+			INSERT INTO users (id) VALUES ('00000000-0000-0000-0000-000000000000') ON CONFLICT (id) DO NOTHING;
+
+			INSERT INTO departments (
+				id,
+				internal_id,
+				name
+			) VALUES (
+				'00000000-0000-0000-0000-000000000000',
+				'',
+				''
+			) 
+			ON CONFLICT (id) DO NOTHING;
+
+			INSERT INTO user_details (
+				id,
+				staff_id,
+				first_name,
+				last_name,
+				title,
+				department_id,
+				supervisor_id,
+				user_right,
+				email,
+				max_child_task_level,
+				visitor
+			) VALUES (
+				'00000000-0000-0000-0000-000000000000',
+				'00000000-0000-0000-0000-000000000000',
+				'(No',
+				'Supervisor)',
+				'',
+				'00000000-0000-0000-0000-000000000000',
+				'00000000-0000-0000-0000-000000000000',
+				0,
+				'',
+				1,
+				false
+			)
+			ON CONFLICT (id) DO NOTHING;
 		END;
 	`)
 	if err != nil {
