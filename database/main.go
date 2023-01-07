@@ -336,6 +336,7 @@ func Setup() {
 					ON DELETE CASCADE
 			);
 
+			ALTER TABLE task_custom_user_fields DROP CONSTRAINT IF EXISTS task_custom_user_fields_uid_type;
 			ALTER TABLE task_custom_user_fields ADD CONSTRAINT task_custom_user_fields_uid_type UNIQUE (uid,field_type);
 
 			CREATE TABLE IF NOT EXISTS task_custom_user_field_values (
