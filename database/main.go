@@ -351,6 +351,7 @@ func Setup() {
 			);
 
 			CREATE UNIQUE INDEX IF NOT EXISTS task_custom_user_fields_uid_type ON task_custom_user_fields USING btree ((uid::text || '_' || field_type));
+			ALTER TABLE task_custom_user_fields ADD CONSTRAINT task_custom_user_fields_uid_type UNIQUE USING INDEX task_custom_user_fields_uid_type;
 
 			INSERT INTO task_approval_list (id,name) VALUES
 				(0,'rejected'),
@@ -654,7 +655,6 @@ func Setup() {
 		os.Getenv("PROJMGMT_DEMO_USER_AVATAR"),
 	)
 	if err != nil {
-		fmt.Println("b")
 		panic(err)
 	}
 
