@@ -10,6 +10,9 @@ import (
 )
 
 func pingWebsocket() {
+	// message has to be map, or the client side will disconnect
+	// interval has to be under 60 seconds
+
 	myMap := make(map[string]string)
 	for {
 		for _, connMap := range wsUsers {

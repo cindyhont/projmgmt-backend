@@ -54,6 +54,8 @@ func updateChatRoomTyping(chatroomID string, uid string, typing bool, myConn *ne
 			"uid":    uid,
 			"typing": typing,
 		},
+		UserIDs:         userIDs,
+		ToAllRecipients: false,
 	}
 
 	toSelectedUsers(&userIDs, &res, myConn)
@@ -129,6 +131,7 @@ func dispatchMsgFromDB(myConn *net.Conn, reqID string) {
 		toAllRecipients(res, myConn)
 	} else {
 		userIDs := getReqestReceivers(reqID)
+		res.UserIDs = *userIDs
 		toSelectedUsers(userIDs, res, myConn)
 	}
 }
@@ -180,6 +183,7 @@ func announceUserStatus(uid string, online bool) {
 			"id":     uid,
 			"online": online,
 		},
+		ToAllRecipients: true,
 	}
 
 	for user, connMap := range wsUsers {
