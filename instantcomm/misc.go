@@ -20,7 +20,6 @@ func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 				}
 				if err := dispatchIndividualMessage(conn, res); err != nil {
 					fmt.Println(err)
-					return
 				}
 			}
 		}
@@ -118,7 +117,6 @@ func toAllRecipients(res *Response, myConn *net.Conn) {
 			}
 			if err := dispatchIndividualMessage(conn, res); err != nil {
 				fmt.Println(err)
-				return
 			}
 		}
 	}
