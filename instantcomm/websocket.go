@@ -50,15 +50,23 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				}
 			}
 
-			var req request
+			// hide for testing
+			/*
+				var req request
+				if err := decoder.Decode(&req); err != nil {
+					CleanOldWsRecords()
+					return
+				}
+			*/
+
+			// test start
+			// if req.Request != "" {
+			var response Response
 			if err := decoder.Decode(&req); err != nil {
 				CleanOldWsRecords()
 				return
 			}
-
-			// test start
-			// if req.Request != "" {
-			b, err := json.Marshal(req)
+			b, err := json.Marshal(response)
 			if err != nil {
 				fmt.Println(err)
 				continue
