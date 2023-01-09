@@ -18,10 +18,9 @@ var pubsubConn net.Conn
 func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	var uid string
 
-	// hide for testing
-	// if !originOK(req) {
-	// 	return
-	// }
+	if !originOK(req) {
+		return
+	}
 
 	myConn, _, _, err := ws.UpgradeHTTP(req, res)
 	if err != nil {
@@ -50,69 +49,42 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				}
 			}
 
-			// hide for testing
-			/*
-				var req request
-				if err := decoder.Decode(&req); err != nil {
-					CleanOldWsRecords()
-					return
-				}
-			*/
-
-			// test start
-			// if req.Request != "" {
-			var response Response
-			if err := decoder.Decode(&response); err != nil {
+			var req request
+			if err := decoder.Decode(&req); err != nil {
 				CleanOldWsRecords()
 				return
 			}
-			fmt.Println(response.Type)
-			b, err := json.Marshal(response)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			err = wsutil.WriteClientMessage(pubsubConn, ws.OpText, b)
-			if err != nil {
-				fmt.Println(err)
+
+			if req.Request == "" && len(req.Requests) == 0 {
+				CleanOldWsRecords()
 				return
 			}
-			// }
-			// test end
 
-			// hide for testing
-			/*
-				if req.Request == "" && len(req.Requests) == 0 {
-					CleanOldWsRecords()
-					return
-				}
-
-				if req.Request == "online-users" && req.UserID != "" {
-					if checkUserExists(req.UserID) {
-						uid = req.UserID
-						if _, keyAlreadyExists := wsUsers[uid]; keyAlreadyExists {
-							wsUsers[uid][&myConn] = true
-						} else {
-							var user = make(map[*net.Conn]bool)
-							user[&myConn] = true
-							wsUsers[uid] = user
-						}
-						go sendOnlineUserList(&myConn, uid)
-						go announceUserStatus(uid, true)
+			if req.Request == "online-users" && req.UserID != "" {
+				if checkUserExists(req.UserID) {
+					uid = req.UserID
+					if _, keyAlreadyExists := wsUsers[uid]; keyAlreadyExists {
+						wsUsers[uid][&myConn] = true
 					} else {
-						return
+						var user = make(map[*net.Conn]bool)
+						user[&myConn] = true
+						wsUsers[uid] = user
 					}
-				} else if req.Request == "chat_typing" && uid != "" {
-					updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
-				} else if req.Request != "" {
-					go dispatchMsgFromDB(&myConn, req.Request)
-				} else if len(req.Requests) != 0 {
-					for _, wsid := range req.Requests {
-						go dispatchMsgFromDB(&myConn, wsid)
-					}
+					go sendOnlineUserList(&myConn, uid)
+					go announceUserStatus(uid, true)
+				} else {
+					return
 				}
-				CleanOldWsRecords()
-			*/
+			} else if req.Request == "chat_typing" && uid != "" {
+				updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
+			} else if req.Request != "" {
+				go dispatchMsgFromDB(&myConn, req.Request)
+			} else if len(req.Requests) != 0 {
+				for _, wsid := range req.Requests {
+					go dispatchMsgFromDB(&myConn, wsid)
+				}
+			}
+			CleanOldWsRecords()
 		}
 	}()
 }
@@ -132,14 +104,63 @@ func connectWebsocketAsClient() {
 
 	go func() {
 		for {
-			msg, _, err := wsutil.ReadServerData(pubsubConn)
+			resBytes, _, err := wsutil.ReadServerData(pubsubConn)
 			if err != nil {
 				fmt.Println(err)
 				return
-			} else {
-				var m map[string]interface{}
-				json.Unmarshal(msg, &m)
-				fmt.Println(m)
+			}
+
+			var res Response
+			err = json.Unmarshal(resBytes, &res)
+			if err != nil {
+				continue
+			}
+
+			if res.Type == "server-disconnect" {
+				offlineUsers := make([]string, 0)
+
+				for uid, thisServerUserCount := range res.OtherServersUserCount {
+					if count, exists := otherServersUserCount[uid]; exists {
+						if count > thisServerUserCount {
+							otherServersUserCount[uid] = count - thisServerUserCount
+						} else {
+							offlineUsers = append(offlineUsers, uid)
+							delete(otherServersUserCount, uid)
+						}
+					}
+				}
+
+				if len(offlineUsers) != 0 {
+					newResponse := Response{
+						Type:            "server-disconnect",
+						ToAllRecipients: true,
+						UserIDs:         offlineUsers,
+					}
+
+					dispatchResponseFromOtherServer(&newResponse)
+				}
+				continue
+			} else if res.Type == "online-users" {
+				uid := res.Payload["id"].(string)
+				online := res.Payload["online"].(bool)
+
+				if count, exists := otherServersUserCount[uid]; exists {
+					if online {
+						otherServersUserCount[uid] = count + 1
+					} else {
+						if count > 1 {
+							otherServersUserCount[uid] = count - 1
+						} else {
+							delete(otherServersUserCount, uid)
+						}
+					}
+				} else if online {
+					otherServersUserCount[uid] = 1
+				}
+			}
+
+			if res.Type != "" {
+				dispatchResponseFromOtherServer(&res)
 			}
 		}
 	}()

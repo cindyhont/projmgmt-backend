@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	wsUsers          = map[string]map[*net.Conn]bool{}
-	otherServersConn = map[string]map[string]int{}
+	wsUsers               = map[string]map[*net.Conn]bool{}
+	otherServersUserCount = map[string]int{}
 )

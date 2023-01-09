@@ -10,6 +10,41 @@ import (
 	"github.com/gobwas/ws/wsutil"
 )
 
+func dispatchResponseFromOtherServer(res *Response) {
+	if res.ToAllRecipients {
+		for _, connMap := range wsUsers {
+			for conn := range connMap {
+				if err := dispatchIndividualMessage(conn, res); err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+	} else if len(res.UserIDs) != 0 {
+		for _, uid := range res.UserIDs {
+			if connMap, userIsOnline := wsUsers[uid]; userIsOnline {
+				for conn := range connMap {
+					if err := dispatchIndividualMessage(conn, res); err != nil {
+						fmt.Println(err)
+					}
+				}
+			}
+		}
+	}
+}
+
+func dispatchToServers(res *Response) {
+	b, err := json.Marshal(*res)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = wsutil.WriteClientMessage(pubsubConn, ws.OpText, b)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
 func toSelectedUsers(userIDs *[]string, res *Response, myConn *net.Conn) {
 	for _, uid := range *userIDs {
 		if _, userIsOnline := wsUsers[uid]; userIsOnline {
@@ -65,10 +100,8 @@ func sendOnlineUserList(myConn *net.Conn, userID string) {
 	userIDs := make([]string, 0)
 	userIdMap := map[string]bool{}
 
-	for _, userConnCounts := range otherServersConn {
-		for userid := range userConnCounts {
-			userIdMap[userid] = true
-		}
+	for otherServerUID := range otherServersUserCount {
+		userIdMap[otherServerUID] = true
 	}
 
 	for userid := range wsUsers {
@@ -128,10 +161,12 @@ func dispatchMsgFromDB(myConn *net.Conn, reqID string) {
 	res := getReqestContent(reqID)
 
 	if res.ToAllRecipients {
+		dispatchToServers(res)
 		toAllRecipients(res, myConn)
 	} else {
 		userIDs := getReqestReceivers(reqID)
 		res.UserIDs = *userIDs
+		dispatchToServers(res)
 		toSelectedUsers(userIDs, res, myConn)
 	}
 }
@@ -186,6 +221,8 @@ func announceUserStatus(uid string, online bool) {
 		ToAllRecipients: true,
 	}
 
+	dispatchToServers(&res)
+
 	for user, connMap := range wsUsers {
 		if user == uid {
 			continue
@@ -197,8 +234,6 @@ func announceUserStatus(uid string, online bool) {
 			}
 		}
 	}
-
-	res.ToAllRecipients = true
 }
 
 func closeConnection(myConn *net.Conn) {
