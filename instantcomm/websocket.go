@@ -113,6 +113,7 @@ func connectWebsocketAsClient() {
 		return
 	}
 
+	fmt.Println(pubsubConn)
 	defer pubsubConn.Close()
 
 	var forever chan struct{}
