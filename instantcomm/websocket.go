@@ -18,9 +18,10 @@ var pubsubConn net.Conn
 func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	var uid string
 
-	if !originOK(req) {
-		return
-	}
+	// hide for testing
+	// if !originOK(req) {
+	// 	return
+	// }
 
 	myConn, _, _, err := ws.UpgradeHTTP(req, res)
 	if err != nil {
@@ -55,36 +56,50 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				return
 			}
 
-			if req.Request == "" && len(req.Requests) == 0 {
-				CleanOldWsRecords()
-				return
-			}
-
-			if req.Request == "online-users" && req.UserID != "" {
-				if checkUserExists(req.UserID) {
-					uid = req.UserID
-					if _, keyAlreadyExists := wsUsers[uid]; keyAlreadyExists {
-						wsUsers[uid][&myConn] = true
-					} else {
-						var user = make(map[*net.Conn]bool)
-						user[&myConn] = true
-						wsUsers[uid] = user
-					}
-					go sendOnlineUserList(&myConn, uid)
-					go announceUserStatus(uid, true)
-				} else {
+			// test start
+			if req.Request != "" {
+				b, _ := json.Marshal(req)
+				err = wsutil.WriteClientMessage(pubsubConn, ws.OpText, b)
+				if err != nil {
+					fmt.Println(err)
 					return
 				}
-			} else if req.Request == "chat_typing" && uid != "" {
-				updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
-			} else if req.Request != "" {
-				go dispatchMsgFromDB(&myConn, req.Request)
-			} else if len(req.Requests) != 0 {
-				for _, wsid := range req.Requests {
-					go dispatchMsgFromDB(&myConn, wsid)
-				}
 			}
-			CleanOldWsRecords()
+			// test end
+
+			// hide for testing
+			/*
+				if req.Request == "" && len(req.Requests) == 0 {
+					CleanOldWsRecords()
+					return
+				}
+
+				if req.Request == "online-users" && req.UserID != "" {
+					if checkUserExists(req.UserID) {
+						uid = req.UserID
+						if _, keyAlreadyExists := wsUsers[uid]; keyAlreadyExists {
+							wsUsers[uid][&myConn] = true
+						} else {
+							var user = make(map[*net.Conn]bool)
+							user[&myConn] = true
+							wsUsers[uid] = user
+						}
+						go sendOnlineUserList(&myConn, uid)
+						go announceUserStatus(uid, true)
+					} else {
+						return
+					}
+				} else if req.Request == "chat_typing" && uid != "" {
+					updateChatRoomTyping(req.ChatRoomID, uid, req.Typing, &myConn)
+				} else if req.Request != "" {
+					go dispatchMsgFromDB(&myConn, req.Request)
+				} else if len(req.Requests) != 0 {
+					for _, wsid := range req.Requests {
+						go dispatchMsgFromDB(&myConn, wsid)
+					}
+				}
+				CleanOldWsRecords()
+			*/
 		}
 	}()
 }
