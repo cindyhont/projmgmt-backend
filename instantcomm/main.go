@@ -6,5 +6,6 @@ import (
 
 func Run() {
 	go pingWebsocket()
+	go connectWebsocketAsClient()
 	router.Router.GET("/ws", runWS)
 }

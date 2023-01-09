@@ -1,14 +1,19 @@
 package instantcomm
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	"github.com/julienschmidt/httprouter"
 )
+
+var pubsubConn net.Conn
 
 func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	var uid string
@@ -82,4 +87,33 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 			CleanOldWsRecords()
 		}
 	}()
+}
+
+func connectWebsocketAsClient() {
+	var err error
+	pubsubConn, _, _, err = ws.DefaultDialer.Dial(context.Background(), os.Getenv("PROJMGMT_PUBSUB_WS_URL"))
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer pubsubConn.Close()
+
+	var forever chan struct{}
+
+	go func() {
+		for {
+			msg, _, err := wsutil.ReadServerData(pubsubConn)
+			if err != nil {
+				fmt.Println(err)
+				return
+			} else {
+				fmt.Println(string(msg))
+			}
+		}
+	}()
+
+	<-forever
+	fmt.Println("pubsub conn ended")
 }
