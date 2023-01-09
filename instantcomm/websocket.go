@@ -136,7 +136,9 @@ func connectWebsocketAsClient() {
 				fmt.Println(err)
 				return
 			} else {
-				fmt.Println(string(msg))
+				var m map[string]interface{}
+				json.Unmarshal(msg, &m)
+				fmt.Println(m)
 			}
 		}
 	}()
