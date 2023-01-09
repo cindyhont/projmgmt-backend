@@ -57,14 +57,18 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 			}
 
 			// test start
-			if req.Request != "" {
-				b, _ := json.Marshal(req)
-				err = wsutil.WriteClientMessage(pubsubConn, ws.OpText, b)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
+			// if req.Request != "" {
+			b, err := json.Marshal(req)
+			if err != nil {
+				fmt.Println(err)
+				continue
 			}
+			err = wsutil.WriteClientMessage(pubsubConn, ws.OpText, b)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			// }
 			// test end
 
 			// hide for testing
@@ -113,7 +117,6 @@ func connectWebsocketAsClient() {
 		return
 	}
 
-	fmt.Println(pubsubConn)
 	defer pubsubConn.Close()
 
 	var forever chan struct{}
