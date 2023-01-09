@@ -62,7 +62,7 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 			// test start
 			// if req.Request != "" {
 			var response Response
-			if err := decoder.Decode(&req); err != nil {
+			if err := decoder.Decode(&response); err != nil {
 				CleanOldWsRecords()
 				return
 			}
