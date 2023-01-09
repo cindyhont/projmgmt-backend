@@ -66,6 +66,7 @@ func runWS(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 				CleanOldWsRecords()
 				return
 			}
+			fmt.Println(response)
 			b, err := json.Marshal(response)
 			if err != nil {
 				fmt.Println(err)
